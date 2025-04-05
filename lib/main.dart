@@ -104,40 +104,52 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: _pages[_selectedIndex],
-        bottomNavigationBar: Theme(
-          data: Theme.of(context).copyWith(
-              // sets the background color of the `BottomNavigationBar`
-              canvasColor: Color.fromARGB(255, 55, 121, 140)),
-          child: BottomNavigationBar(
-            items: const <BottomNavigationBarItem>[
-              BottomNavigationBarItem(
-                icon: Icon(Icons.dashboard),
-                label: 'Dashboard',
+      appBar: null,
+      body: _pages[_selectedIndex],
+      bottomNavigationBar: Theme(
+        data: Theme.of(context).copyWith(
+            // sets the background color of the `BottomNavigationBar`
+            canvasColor: Color.fromARGB(255, 55, 121, 140)),
+        child: BottomNavigationBar(
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: ImageIcon(
+                AssetImage('assets/dashboard.png'), // Custom dashboard icon
               ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.history),
-                label: 'Backward',
+              label: 'Dashboard',
+            ),
+            BottomNavigationBarItem(
+              icon: ImageIcon(
+                AssetImage('assets/past.png'), // Custom backward icon
               ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.arrow_forward),
-                label: 'Onward',
+              label: 'Backward',
+            ),
+            BottomNavigationBarItem(
+              icon: ImageIcon(
+                AssetImage('assets/present.png'), // Custom onward icon
               ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.fast_forward),
-                label: 'Forward',
+              label: 'Onward',
+            ),
+            BottomNavigationBarItem(
+              icon: ImageIcon(
+                AssetImage('assets/future.png'), // Custom forward icon
               ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.settings),
-                label: 'Settings',
+              label: 'Forward',
+            ),
+            BottomNavigationBarItem(
+              icon: ImageIcon(
+                AssetImage('assets/settings.png'), // Custom settings icon
               ),
-            ],
-            currentIndex: _selectedIndex,
-            selectedItemColor: Color(0xFFAAC7C0), // Deep purple color in hex
-            unselectedItemColor: Colors
-                .white, // Light teal color in hex // Set the background color to solid black
-            onTap: _onItemTapped,
-          ),
-        ));
+              label: 'Settings',
+            ),
+          ],
+          currentIndex: _selectedIndex,
+          selectedItemColor: Color(0xFFAAC7C0), // Deep purple color
+          unselectedItemColor:
+              Color.fromARGB(255, 255, 255, 255), // Light teal color
+          onTap: _onItemTapped,
+        ),
+      ),
+    );
   }
 }

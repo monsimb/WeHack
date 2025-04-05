@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'pages.dart'; // Import the pages file
 
 void main() {
   runApp(const MyApp());
@@ -7,46 +8,75 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme:
+            ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 55, 121, 140)),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const SplashScreen(), // Set the splash screen as the initial page
+    );
+  }
+}
+
+class SplashScreen extends StatelessWidget {
+  const SplashScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        clipBehavior: Clip.antiAlias,
+        decoration: const BoxDecoration(color: Color(0xFFF7E0CA)),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Align(
+              alignment: Alignment.center,
+              child: Image.asset(
+                'assets/planit.png', // Ensure this asset exists in your project
+                width: 250,
+                height: 250,
+              ),
+            ),
+            const Align(
+              alignment: Alignment.center,
+              child: Text(
+                'PlanIt',
+                style: TextStyle(
+                  color: Color(0xFF160F29),
+                  fontSize: 60,
+                  fontFamily: 'Orbitron',
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          const MyHomePage(title: 'Flutter Demo Home Page')),
+                );
+              },
+              child: const Text('Get Started'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
 
   final String title;
 
@@ -55,57 +85,71 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  int _selectedIndex = 0;
 
-  void _incrementCounter() {
+  static const List<Widget> _pages = <Widget>[
+    Dashboard(),
+    LookBackward(),
+    LookOnward(),
+    LookForward(),
+    SettingsPage(),
+  ];
+
+  void _onItemTapped(int index) {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      _selectedIndex = index;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
-      body: Container(
-        width: 412,
-        height: 917,
-        clipBehavior: Clip.antiAlias,
-        decoration: BoxDecoration(color: const Color(0xFFF7E0CA)),
-        child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-                Align(
-                    alignment: Alignment.center,
-                    child: Image.asset( 'assets/planit.png',
-                      width: 250,
-                      height: 250,)
-                    ),
-                Align(
-                    alignment: Alignment.center,
-                    child: Text(
-                        'PlanIt',
-                        style: TextStyle(
-                            color: const Color(0xFF160F29),
-                            fontSize: 60,
-                            fontFamily: 'Orbitron',
-                            fontWeight: FontWeight.w600,
-                        ),
-                    ),
-                ),
-            ],
+      appBar: null,
+      body: _pages[_selectedIndex],
+      bottomNavigationBar: Theme(
+        data: Theme.of(context).copyWith(
+            // sets the background color of the `BottomNavigationBar`
+            canvasColor: Color.fromARGB(255, 55, 121, 140)),
+        child: BottomNavigationBar(
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: ImageIcon(
+                AssetImage('assets/dashboard.png'), // Custom dashboard icon
+              ),
+              label: 'Dashboard',
+            ),
+            BottomNavigationBarItem(
+              icon: ImageIcon(
+                AssetImage('assets/past.png'), // Custom backward icon
+              ),
+              label: 'Backward',
+            ),
+            BottomNavigationBarItem(
+              icon: ImageIcon(
+                AssetImage('assets/present.png'), // Custom onward icon
+              ),
+              label: 'Onward',
+            ),
+            BottomNavigationBarItem(
+              icon: ImageIcon(
+                AssetImage('assets/future.png'), // Custom forward icon
+              ),
+              label: 'Forward',
+            ),
+            BottomNavigationBarItem(
+              icon: ImageIcon(
+                AssetImage('assets/settings.png'), // Custom settings icon
+              ),
+              label: 'Settings',
+            ),
+          ],
+          currentIndex: _selectedIndex,
+          selectedItemColor: Color(0xFFAAC7C0), // Deep purple color
+          unselectedItemColor:
+              Color.fromARGB(255, 255, 255, 255), // Light teal color
+          onTap: _onItemTapped,
         ),
-      )
+      ),
     );
   }
 }

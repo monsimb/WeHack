@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'pages.dart'; // Import the pages file
 
@@ -22,9 +23,22 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class SplashScreen extends StatelessWidget {
+class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
 
+class _SplashScreenState extends State<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+
+    Timer(
+        const Duration(seconds: 2),
+        () => Navigator.of(context).pushReplacement(MaterialPageRoute(
+            builder: (BuildContext context) => const MyHomePage(title: 'title')),));
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,7 +46,7 @@ class SplashScreen extends StatelessWidget {
         width: double.infinity,
         height: double.infinity,
         clipBehavior: Clip.antiAlias,
-        decoration: const BoxDecoration(color: Color(0xFFF7E0CA)),
+        decoration: const BoxDecoration(color: Color.fromARGB(255, 245, 243, 242)),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -55,18 +69,6 @@ class SplashScreen extends StatelessWidget {
                   fontWeight: FontWeight.w600,
                 ),
               ),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          const MyHomePage(title: 'Flutter Demo Home Page')),
-                );
-              },
-              child: const Text('Get Started'),
             ),
           ],
         ),

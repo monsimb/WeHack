@@ -32,30 +32,55 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _fadeAnimation;
+
   @override
   void initState() {
     super.initState();
 
-    Timer(
-        const Duration(seconds: 2),
-        () => Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                  builder: (BuildContext context) =>
-                      const MyHomePage(title: 'title')),
-            ));
+    // Initialize the animation controller
+    _controller = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    );
+
+    // Define the fade animation
+    _fadeAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(_controller);
+
+    // Start the animation and navigate to MyHomePage after it completes
+    Future.delayed(const Duration(seconds: 2), () {
+      _controller.forward().then((_) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (BuildContext context) =>
+                const MyHomePage(title: 'title'),
+          ),
+        );
+      });
+    });
+  }
+  @override
+  void dispose() {
+    _controller.dispose(); // Dispose the animation controller
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        clipBehavior: Clip.antiAlias,
-        decoration:
-            const BoxDecoration(color: Color.fromARGB(255, 245, 243, 242)),
-        child: Column(
+      body: FadeTransition(
+        opacity: _fadeAnimation,
+        child: Container(
+          width: double.infinity,
+          height: double.infinity,
+          clipBehavior: Clip.antiAlias,
+          decoration: const BoxDecoration(
+            color: Color.fromARGB(255, 245, 243, 242),
+          ),
+          child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Align(
@@ -81,7 +106,7 @@ class _SplashScreenState extends State<SplashScreen> {
           ],
         ),
       ),
-    );
+    ));
   }
 }
 

@@ -12,12 +12,7 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardState extends State<Dashboard> {
   late Future<List<Map<String, dynamic>>> _recentPurchases;
-  Map<String, double> categoryData = {
-    "Shopping": 46.1,
-    "Bills": 28.7,
-    "Transport": 16.2,
-    "Other": 9.0,
-  };
+  Map<String, double> categoryData = {};
 
   @override
   void initState() {
@@ -41,15 +36,46 @@ class _DashboardState extends State<Dashboard> {
   }
 
   void calculateCategoryData(List<Map<String, dynamic>> purchases) {
-    // Set fixed percentages for the pie chart
-    categoryData = {
-      "Shopping": 46.1,
-      "Bills": 28.7,
-      "Transport": 16.2,
-      "Other": 9.0,
-    };
+    final Map<String, double> categoryTotals = {};
+
+    for (var purchase in purchases) {
+      final category = purchase['category'] ?? 'Other';
+      final amount = purchase['amount'] ?? 0.0;
+
+      if (categoryTotals.containsKey(category)) {
+        categoryTotals[category] = categoryTotals[category]! + amount;
+      } else {
+        categoryTotals[category] = amount;
+      }
+    }
+
+    final totalAmount =
+        categoryTotals.values.fold(0.0, (sum, value) => sum + value);
+
+    categoryData = categoryTotals
+        .map((key, value) => MapEntry(key, (value / totalAmount) * 100));
 
     setState(() {});
+  }
+
+  List<Map<String, String>> generateQuests() {
+    return [
+      {
+        "title": "Spend < max \$15 for the next 3 days",
+        "description":
+            "Track your daily expenses and ensure you spend less than \$15 for the next 3 days."
+      },
+      {
+        "title": "Save time for yourself",
+        "description":
+            "Block a time on your calendar to remind yourself to take a short break every 90 minutes."
+      },
+      {
+        "title": "Auto-transfer \$10 to savings today",
+        "description":
+            "Boost your savings by transferring \$10 to your savings account today."
+      },
+    ];
   }
 
   @override
@@ -73,7 +99,7 @@ class _DashboardState extends State<Dashboard> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(height: 30.0), // Bring down all containers
+              const SizedBox(height: 30.0),
 
               // Welcome Back Card
               Container(
@@ -95,23 +121,22 @@ class _DashboardState extends State<Dashboard> {
                 ),
               ),
 
-              const SizedBox(height: 30), // Existing spacing
+              const SizedBox(height: 30),
 
-              // Pie Chart and Legend Background Overlay
+              // Pie Chart Section
               Container(
-                width: 400, // Match the width of Recent Purchases
+                width: 400,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(25),
-                  color: const Color(0xfff5f3f2), // Solid #f5f3f2 background
+                  color: const Color(0xfff5f3f2),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(20),
                   child: Column(
                     children: [
-                      // Pie Chart
                       SizedBox(
                         height: 200,
-                        child: categoryData.values.every((value) => value == 0)
+                        child: categoryData.isEmpty
                             ? const Center(
                                 child: Text(
                                   "No data available for the pie chart.",
@@ -123,15 +148,11 @@ class _DashboardState extends State<Dashboard> {
                             : PieChart(
                                 PieChartData(
                                   sections: categoryData.entries.map((entry) {
-                                    final total = categoryData.values
-                                        .reduce((a, b) => a + b);
-                                    final percentage =
-                                        (entry.value / total) * 100;
                                     return PieChartSectionData(
                                       value: entry.value,
                                       color: _getCategoryColor(entry.key),
                                       title:
-                                          '${percentage.toStringAsFixed(1)}%', // Display percentage
+                                          '${entry.value.toStringAsFixed(1)}%',
                                       titleStyle: const TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.bold,
@@ -144,33 +165,14 @@ class _DashboardState extends State<Dashboard> {
                                 ),
                               ),
                       ),
-
                       const SizedBox(height: 16.0),
-
-                      // Legend (Two Lines)
                       Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: const [
-                              LegendItem(
-                                  color: Color(0xffcb2b49),
-                                  text: 'Shopping'), // Changed from Food
-                              LegendItem(
-                                  color: Color(0xffaac7c0), text: 'Transport'),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: const [
-                              LegendItem(
-                                  color: Color(0xff37798c),
-                                  text: 'Bills'), // Changed from Shopping
-                              LegendItem(color: Colors.grey, text: 'Other'),
-                            ],
-                          ),
-                        ],
+                        children: categoryData.entries.map((entry) {
+                          return LegendItem(
+                            color: _getCategoryColor(entry.key),
+                            text: entry.key,
+                          );
+                        }).toList(),
                       ),
                     ],
                   ),
@@ -179,21 +181,19 @@ class _DashboardState extends State<Dashboard> {
 
               const SizedBox(height: 30),
 
-              // Recent Purchases Card
+              // Recent Purchases Section
               Padding(
                 padding: const EdgeInsets.all(10),
                 child: Container(
                   width: 400,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(25),
-                    color: const Color(0xff37798c), // Dark blue overlay
+                    color: const Color(0xff37798c),
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(20),
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        // Recent Purchases Title
                         Container(
                           width: 400,
                           decoration: BoxDecoration(
@@ -209,17 +209,13 @@ class _DashboardState extends State<Dashboard> {
                                 style: TextStyle(
                                   color: Colors.black,
                                   fontSize: 24,
-                                  fontFamily: 'Bai Jamjuree',
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
                             ),
                           ),
                         ),
-
                         const SizedBox(height: 16.0),
-
-                        // Display Recent Purchases
                         FutureBuilder<List<Map<String, dynamic>>>(
                           future: _recentPurchases,
                           builder: (context, snapshot) {
@@ -256,7 +252,6 @@ class _DashboardState extends State<Dashboard> {
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
                                           children: [
-                                            // Align date and amount on the left
                                             Row(
                                               children: [
                                                 Text(
@@ -278,7 +273,6 @@ class _DashboardState extends State<Dashboard> {
                                                 ),
                                               ],
                                             ),
-                                            // Merchant name on the right
                                             Text(
                                               purchase['description'],
                                               style: const TextStyle(
@@ -302,84 +296,71 @@ class _DashboardState extends State<Dashboard> {
                   ),
                 ),
               ),
-              const SizedBox(height: 25),
 
-              // This Week's Spending Card
-              Container(
-                width: 359,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(25),
-                  color: const Color(0xffaac7c0),
-                ),
-                child: Column(
-                  children: [
-                    const SizedBox(height: 10),
-                    const Text(
-                      "This Week’s Spending",
-                      style: TextStyle(
-                        fontSize: 26,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    for (var dayData in [
-                      {"day": "SUN", "amount": "\$40", "category": "Food"},
-                      {"day": "MON", "amount": "\$15", "category": "Transport"},
-                      {"day": "TUE", "amount": "\$25", "category": "Shopping"},
-                      {"day": "WED", "amount": "\$10", "category": "Other"},
-                      {"day": "THU", "amount": "\$30", "category": "Food"},
-                      {"day": "FRI", "amount": "\$20", "category": "Transport"},
-                      {"day": "SAT", "amount": "\$50", "category": "Shopping"},
-                    ])
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 5.0),
-                        child: Container(
-                          width: 330,
-                          height: 35,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(25),
-                            color: const Color(0xfff5f3f2),
+              const SizedBox(height: 30),
+
+              // Smart Assistant Quests Section
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: Container(
+                  width: 400,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(25),
+                    color: const Color(0xfff5f3f2),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Smart Assistant Quests",
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black,
                           ),
-                          child: Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 15.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  dayData["day"]!,
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                Row(
+                        ),
+                        const SizedBox(height: 16.0),
+                        ...generateQuests().map((quest) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(15),
+                                color: const Color(0xff37798c),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      dayData["amount"]!,
+                                      quest["title"]!,
                                       style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w600,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
                                       ),
                                     ),
-                                    const SizedBox(width: 10),
+                                    const SizedBox(height: 8),
                                     Text(
-                                      dayData["category"]!,
+                                      quest["description"]!,
                                       style: const TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w400,
-                                        color: Colors.grey,
+                                        color: Colors.white70,
                                       ),
                                     ),
                                   ],
                                 ),
-                              ],
+                              ),
                             ),
-                          ),
-                        ),
-                      ),
-                    const SizedBox(height: 10),
-                  ],
+                          );
+                        }).toList(),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ],

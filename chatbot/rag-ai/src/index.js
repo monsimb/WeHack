@@ -24,20 +24,26 @@ async function getGoogleCalendarEvents() {
     {
       id: "1",
       summary: "Team Meeting",
-      start: { dateTime: "2025-04-07T10:00:00Z" },
-      end: { dateTime: "2025-04-08T11:00:00Z" },
+      start: { dateTime: "2025-04-07T15:00:00Z" }, // 10:00 AM ET (UTC-4)
+      end: { dateTime: "2025-04-07T16:00:00Z" },   // 11:00 AM ET (UTC-4)
     },
     {
       id: "2",
       summary: "Lunch with Client",
-      start: { dateTime: "2025-04-08T12:00:00Z" },
-      end: { dateTime: "2025-04-08T13:00:00Z" },
+      start: { dateTime: "2025-04-08T16:00:00Z" }, // 12:00 PM ET (UTC-4)
+      end: { dateTime: "2025-04-08T17:00:00Z" },   // 1:00 PM ET (UTC-4)
     },
     {
       id: "3",
       summary: "Project Deadline",
-      start: { dateTime: "2025-04-08T09:00:00Z" },
-      end: { dateTime: "2025-04-08T17:00:00Z" },
+      start: { dateTime: "2025-04-08T13:00:00Z" }, // 9:00 AM ET (UTC-4)
+      end: { dateTime: "2025-04-08T21:00:00Z" },   // 5:00 PM ET (UTC-4)
+    },
+    {
+      id: "4",
+      summary: "Dinner Date with Sam",
+      start: { dateTime: "2025-04-09T23:00:00Z" }, // 7:00 PM ET (UTC-4)
+      end: { dateTime: "2025-04-10T00:30:00Z" },   // 8:30 PM ET (UTC-4)
     },
   ];
 }
@@ -160,6 +166,35 @@ app.get('/test-db-connection', async (c) => {
   }
 });
 
+// Route: What-if mode
+app.get('/what-if', async (c) => {
+  const userId = c.req.query('userId') || 'default';
+  const scenario = c.req.query('scenario') || '';
+
+
+});
+
+// Route: Generate daily/weekly quests
+app.get('/quests', async (c) => {
+  const userId = c.req.query('userId') || 'default';
+
+  try {
+    const bankAccountInfo = await getMockedBankAccountInfo(userId);
+    const userGoals = await getMockedGoals(userId);
+    const calendarEvents = await getGoogleCalendarEvents();
+
+    const quests = generateQuests(bankAccountInfo, userGoals, calendarEvents);
+
+    const response = c.json(quests);
+    response.headers.set("Access-Control-Allow-Origin", "*");
+    return response;
+  } catch (error) {
+    console.error("Error in /quests:", error);
+    return c.text("Failed to generate quests.", 500);
+  }
+});
+
+
 // ==========================
 // Helper Functions
 // ==========================
@@ -239,6 +274,52 @@ async function generateContext(userId) {
   return [calendarContext, userInfo, bankAccountContext, goalsContext]
     .filter(Boolean)
     .join("\n\n");
+}
+function generateQuests(bankAccountInfo, userGoals, calendarEvents) {
+  const quests = [];
+
+  // Quest 1: Save money by reducing spending
+  const recentExpenses = bankAccountInfo.transactions.filter(txn => txn.amount < 0);
+  const totalExpenses = recentExpenses.reduce((sum, txn) => sum + Math.abs(txn.amount), 0);
+  if (totalExpenses > 100) {
+    quests.push({
+      title: "Reduce Spending",
+      description: "Try to spend $20 less this week by avoiding unnecessary purchases.",
+      action: "Track your expenses and skip one non-essential purchase this week.",
+    });
+  }
+
+  // Quest 2: Progress on short-term goals
+  const shortTermGoal = userGoals.shortTerm.find(goal => goal.progress !== "100%");
+  if (shortTermGoal) {
+    quests.push({
+      title: `Work on Your Goal: ${shortTermGoal.title}`,
+      description: `You're ${shortTermGoal.progress} complete. Take one step today to get closer to achieving this goal.`,
+      action: "Set aside some time or money to make progress on this goal.",
+    });
+  }
+
+  // Quest 3: Add a new productive habit
+  const hasLearningEvent = calendarEvents.some(event => event.summary.toLowerCase().includes("learning"));
+  if (!hasLearningEvent) {
+    quests.push({
+      title: "Add a Learning Habit",
+      description: "Spend 30 minutes today learning something new to improve your skills.",
+      action: "Add a 'Learning Time' event to your calendar and stick to it.",
+    });
+  }
+
+  // Quest 4: Plan for upcoming events
+  const upcomingEvent = calendarEvents.find(event => new Date(event.start.dateTime) > new Date());
+  if (upcomingEvent) {
+    quests.push({
+      title: "Prepare for Your Next Event",
+      description: `You have an upcoming event: "${upcomingEvent.summary}". Make sure you're ready.`,
+      action: "Review your schedule and prepare any materials or tasks needed for this event.",
+    });
+  }
+
+  return quests;
 }
 
 // Route: Chatbot main logic

@@ -47,7 +47,8 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
         backgroundColor: const Color.fromARGB(255, 55, 121, 140),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
+      child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.end,
@@ -93,7 +94,7 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           ],
         ),
-      ),
+      )),
     );
   }
 }

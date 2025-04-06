@@ -10,6 +10,8 @@
  */
 import { Hono } from "hono";
 import { WorkflowEntrypoint } from "cloudflare:workers";
+import { streamToArrayBuffer } from 'hono/utils'; // helps parse audio data
+
 
 const app = new Hono();
 
@@ -137,6 +139,37 @@ app.get('/goals', async (c) => {
     return c.text("Failed to retrieve goals.", 500);
   }
 });
+
+app.post('/transcribe', async (c) => {
+  const apiKey = c.env.DEEPGRAM_API_KEY; // store securely with Wrangler
+  const contentType = c.req.header('Content-Type');
+
+  if (!contentType?.startsWith('audio/')) {
+    return c.text('Expected audio content type', 400);
+  }
+
+  const audioBuffer = await streamToArrayBuffer(c.req.body);
+
+  const response = await fetch('https://api.deepgram.com/v1/listen', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Token 805f8b17fcc95912f9bf050785c6972b95b7fe8a`,
+      'Content-Type': contentType,
+    },
+    body: audioBuffer,
+  });
+
+  if (!response.ok) {
+    console.error(await response.text());
+    return c.text('Deepgram failed to transcribe', 500);
+  }
+
+  const result = await response.json();
+  return c.json({
+    transcript: result?.results?.channels?.[0]?.alternatives?.[0]?.transcript || '',
+  });
+});
+
 
 // Route: Add a new note
 app.post('/notes', async (c) => {

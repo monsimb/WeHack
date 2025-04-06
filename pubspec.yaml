@@ -2,7 +2,7 @@ name: plan_it
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.4.3 <4.0.0'
+  sdk: ">=3.4.3 <4.0.0"
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -31,6 +31,7 @@ dependencies:
   flutter:
     sdk: flutter
   fl_chart: ^0.64.0
+  flutter_tts: ^3.5.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -58,10 +59,8 @@ flutter_launcher_icons:
   android: true
   image_path: "assets/planit.png"
 
-
 # The following section is specific to Flutter packages.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
@@ -74,8 +73,6 @@ flutter:
     - assets/present.png
     - assets/future.png
     - assets/settings.png
-
-    
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
@@ -101,36 +98,36 @@ flutter:
   #         weight: 700
   fonts:
     - family: Bai Jamjuree
-      fonts: 
-      - asset: assets/fonts/BaiJamjuree-Bold.ttf
-        weight: 700
-      - asset: assets/fonts/BaiJamjuree-BoldItalic.ttf
-        weight: 700
-        style: italic
-      - asset: assets/fonts/BaiJamjuree-ExtraLight.ttf
-        weight: 200
-      - asset: assets/fonts/BaiJamjuree-ExtraLightItalic.ttf
-        weight: 200
-        style: italic
-      - asset: assets/fonts/BaiJamjuree-Italic.ttf
-        style: italic
-      - asset: assets/fonts/BaiJamjuree-Light.ttf
-        weight: 300
-      - asset: assets/fonts/BaiJamjuree-LightItalic.ttf
-        weight: 300
-        style: italic
-      - asset: assets/fonts/BaiJamjuree-Medium.ttf
-        weight: 500
-      - asset: assets/fonts/BaiJamjuree-MediumItalic.ttf
-        weight: 500
-        style: italic
-      - asset: assets/fonts/BaiJamjuree-Regular.ttf
-        weight: 400
-      - asset: assets/fonts/BaiJamjuree-SemiBold.ttf
-        weight: 600
-      - asset: assets/fonts/BaiJamjuree-SemiBoldItalic.ttf
-        weight: 600
-        style: italic
+      fonts:
+        - asset: assets/fonts/BaiJamjuree-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/BaiJamjuree-BoldItalic.ttf
+          weight: 700
+          style: italic
+        - asset: assets/fonts/BaiJamjuree-ExtraLight.ttf
+          weight: 200
+        - asset: assets/fonts/BaiJamjuree-ExtraLightItalic.ttf
+          weight: 200
+          style: italic
+        - asset: assets/fonts/BaiJamjuree-Italic.ttf
+          style: italic
+        - asset: assets/fonts/BaiJamjuree-Light.ttf
+          weight: 300
+        - asset: assets/fonts/BaiJamjuree-LightItalic.ttf
+          weight: 300
+          style: italic
+        - asset: assets/fonts/BaiJamjuree-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/BaiJamjuree-MediumItalic.ttf
+          weight: 500
+          style: italic
+        - asset: assets/fonts/BaiJamjuree-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/BaiJamjuree-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/BaiJamjuree-SemiBoldItalic.ttf
+          weight: 600
+          style: italic
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages

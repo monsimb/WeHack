@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:flutter_tts/flutter_tts.dart'; // Import the TTS package
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -20,6 +21,29 @@ class _ChatScreenState extends State<ChatScreen> {
       "https://rag-ai.moniquesimberg.workers.dev/";
 
   final String _userId = DateTime.now().millisecondsSinceEpoch.toString();
+
+  final FlutterTts _flutterTts = FlutterTts(); // Initialize TTS
+  Future<void> _setVoice() async {
+    List<dynamic> voices = await _flutterTts.getVoices;
+
+    // Print available voices (optional)
+    for (var voice in voices) {
+      debugPrint("Voice: $voice");
+    }
+
+    // Pick a specific voice (example for en-US female voice)
+    var selectedVoice = voices.firstWhere(
+      (v) =>
+          v["name"] == "en-us-x-sfg#female_1-local" && v["locale"] == "en-US",
+      orElse: () => null,
+    );
+
+    if (selectedVoice != null) {
+      await _flutterTts.setVoice(selectedVoice);
+    } else {
+      debugPrint("Selected voice not found.");
+    }
+  }
 
   Future<void> _sendQuestion(String question) async {
     if (question.isEmpty) {
@@ -51,6 +75,9 @@ class _ChatScreenState extends State<ChatScreen> {
           _messages.removeLast();
           _messages.add({"role": "assistant", "content": responseBody});
         });
+
+        // Speak the AI's response
+        _speak(responseBody);
       } else {
         setState(() {
           // Replace the "Penny is Thinking..." message with an error message
@@ -105,9 +132,17 @@ class _ChatScreenState extends State<ChatScreen> {
     _thinkingMessage = "Penny is Thinking";
   }
 
+  Future<void> _speak(String text) async {
+    await _flutterTts.setLanguage("en-US");
+    await _flutterTts.setPitch(1.0);
+    await _setVoice(); // Set the voice before speaking
+    await _flutterTts.speak(text);
+  }
+
   @override
   void dispose() {
     _thinkingTimer?.cancel();
+    _flutterTts.stop(); // Stop TTS when the widget is disposed
     super.dispose();
   }
 

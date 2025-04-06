@@ -20,6 +20,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(
             seedColor: const Color.fromARGB(255, 55, 121, 140)),
         useMaterial3: true,
+        fontFamily: 'Bai Jamjuree',
       ),
       home: const SplashScreen(), // Set the splash screen as the initial page
     );

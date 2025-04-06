@@ -1,7 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'pages.dart'; // Import the pages file
-import 'chat.dart';
 import 'dashboard.dart';
 import 'settings.dart';
 import 'chatbot.dart';
@@ -100,7 +98,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
 
   static const List<Widget> _pages = <Widget>[
-    Chatbot(),
+    ChatScreen(),
     Dashboard(),
     Calendar(),
     SettingsPage(),

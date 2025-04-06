@@ -1,0 +1,2 @@
+C:/Users/mosim/Downloads/wehack/plan_it/android/app/.cxx/Debug/2p15b272/x86_64/CMakeFiles/edit_cache.dir
+C:/Users/mosim/Downloads/wehack/plan_it/android/app/.cxx/Debug/2p15b272/x86_64/CMakeFiles/rebuild_cache.dir

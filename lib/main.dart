@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'pages.dart'; // Import the pages file
+import 'chat.dart';
 
 void main() {
   runApp(const MyApp());
@@ -36,9 +37,13 @@ class _SplashScreenState extends State<SplashScreen> {
 
     Timer(
         const Duration(seconds: 2),
-        () => Navigator.of(context).pushReplacement(MaterialPageRoute(
-            builder: (BuildContext context) => const MyHomePage(title: 'title')),));
+        () => Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                  builder: (BuildContext context) =>
+                      const MyHomePage(title: 'title')),
+            ));
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,7 +51,8 @@ class _SplashScreenState extends State<SplashScreen> {
         width: double.infinity,
         height: double.infinity,
         clipBehavior: Clip.antiAlias,
-        decoration: const BoxDecoration(color: Color.fromARGB(255, 245, 243, 242)),
+        decoration:
+            const BoxDecoration(color: Color.fromARGB(255, 245, 243, 242)),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -93,7 +99,6 @@ class _MyHomePageState extends State<MyHomePage> {
     Dashboard(),
     LookBackward(),
     LookOnward(),
-    LookForward(),
     SettingsPage(),
   ];
 
@@ -116,27 +121,21 @@ class _MyHomePageState extends State<MyHomePage> {
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(
               icon: ImageIcon(
-                AssetImage('assets/dashboard.png'), // Custom dashboard icon
+                AssetImage('assets/past.png'), // Custom dashboard icon
+              ),
+              label: 'ChatBot',
+            ),
+            BottomNavigationBarItem(
+              icon: ImageIcon(
+                AssetImage('assets/present.png'), // Custom backward icon
               ),
               label: 'Dashboard',
             ),
             BottomNavigationBarItem(
               icon: ImageIcon(
-                AssetImage('assets/past.png'), // Custom backward icon
+                AssetImage('assets/future.png'), // Custom onward icon
               ),
-              label: 'Backward',
-            ),
-            BottomNavigationBarItem(
-              icon: ImageIcon(
-                AssetImage('assets/present.png'), // Custom onward icon
-              ),
-              label: 'Onward',
-            ),
-            BottomNavigationBarItem(
-              icon: ImageIcon(
-                AssetImage('assets/future.png'), // Custom forward icon
-              ),
-              label: 'Forward',
+              label: 'Calendar',
             ),
             BottomNavigationBarItem(
               icon: ImageIcon(

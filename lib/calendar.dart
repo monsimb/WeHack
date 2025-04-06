@@ -98,54 +98,162 @@ class _CalendarState extends State<Calendar> {
       ),
       body: Column(
         children: [
+          const SizedBox(
+              height: 20), // Add padding between AppBar and Monthly Goals
+
+          // Move Monthly Goals to the top
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const GoalsPage()),
+              );
+            },
+            child: Container(
+              width: 345, // Keep the width as is
+              decoration: BoxDecoration(
+                borderRadius:
+                    BorderRadius.circular(15.0), // Adjust border radius
+                color: const Color(0xffcb2b49),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(
+                    15), // Reduced padding to make it smaller
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15.0),
+                        color: const Color.fromARGB(255, 245, 243, 242),
+                      ),
+                      child: const Padding(
+                        padding: EdgeInsets.all(
+                            8), // Reduced padding inside the title
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: Text(
+                            "Monthly Goals",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 16, // Keep font size as is
+                              fontFamily: 'Bai Jamjuree',
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                        height: 5), // Reduced spacing between title and goals
+                    if (_goals.isNotEmpty)
+                      Column(
+                        children: _goals.map((goal) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 3.0), // Reduced vertical padding
+                            child: Container(
+                              width: 315, // Keep the width as is
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(15.0),
+                                color: const Color.fromARGB(255, 245, 243, 242),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(
+                                    8), // Reduced padding inside each goal
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      goal['title'],
+                                      style: const TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 12, // Keep font size as is
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Progress: ${goal['progress']}',
+                                      style: const TextStyle(
+                                        color: Colors.grey,
+                                        fontSize: 10, // Keep font size as is
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      )
+                    else
+                      const Text(
+                        'No goals available.',
+                        style: TextStyle(fontSize: 10), // Keep font size as is
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+
+          // Calendar Section
           Expanded(
             child: SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   children: [
-                    TableCalendar(
-                      firstDay: DateTime.utc(2000, 1, 1),
-                      lastDay: DateTime.utc(2100, 12, 31),
-                      focusedDay: _focusedDay,
-                      selectedDayPredicate: (day) =>
-                          isSameDay(_selectedDay, day),
-                      onDaySelected: (selectedDay, focusedDay) {
-                        setState(() {
-                          _selectedDay = selectedDay;
-                          _eventDay = DateTime(
-                            _selectedDay!.year,
-                            _selectedDay!.month,
-                            _selectedDay!.day,
-                          );
-                          _focusedDay = focusedDay;
-                        });
-                      },
-                      calendarStyle: const CalendarStyle(
-                        todayDecoration: BoxDecoration(
-                          color: Colors.blue,
-                          shape: BoxShape.circle,
+                    SizedBox(
+                      height:
+                          350, // Adjusted height to make the calendar slightly smaller
+                      child: TableCalendar(
+                        firstDay: DateTime.utc(2000, 1, 1),
+                        lastDay: DateTime.utc(2100, 12, 31),
+                        focusedDay: _focusedDay,
+                        selectedDayPredicate: (day) =>
+                            isSameDay(_selectedDay, day),
+                        onDaySelected: (selectedDay, focusedDay) {
+                          setState(() {
+                            _selectedDay = selectedDay;
+                            _eventDay = DateTime(
+                              _selectedDay!.year,
+                              _selectedDay!.month,
+                              _selectedDay!.day,
+                            );
+                            _focusedDay = focusedDay;
+                          });
+                        },
+                        calendarStyle: const CalendarStyle(
+                          todayDecoration: BoxDecoration(
+                            color: Color.fromARGB(127, 125, 183, 230),
+                            shape: BoxShape.circle,
+                          ),
+                          selectedDecoration: BoxDecoration(
+                            color: Color.fromARGB(127, 170, 199, 192),
+                            shape: BoxShape.circle,
+                          ),
                         ),
-                        selectedDecoration: BoxDecoration(
-                          color: Colors.green,
-                          shape: BoxShape.circle,
+                        headerStyle: const HeaderStyle(
+                          formatButtonVisible: false,
+                          titleCentered: true,
                         ),
-                      ),
-                      headerStyle: const HeaderStyle(
-                        formatButtonVisible: false,
-                        titleCentered: true,
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 15),
 
                     // Display events for the selected day
                     Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.all(16.0),
+                      padding: const EdgeInsets.all(
+                          10.0), // Reduced padding to make it smaller
                       decoration: BoxDecoration(
                         color: const Color.fromARGB(127, 170, 199, 192),
-                        borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(20)),
+                        borderRadius: const BorderRadius.all(
+                          Radius.circular(
+                              20), // Rounded both top and bottom corners
+                        ),
                       ),
                       child: _selectedDay != null && _events[_eventDay] != null
                           ? Column(

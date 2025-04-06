@@ -56,13 +56,13 @@ class _SplashScreenState extends State<SplashScreen>
       _controller.forward().then((_) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (BuildContext context) =>
-                const MyHomePage(title: 'title'),
+            builder: (BuildContext context) => const MyHomePage(title: 'title'),
           ),
         );
       });
     });
   }
+
   @override
   void dispose() {
     _controller.dispose(); // Dispose the animation controller
@@ -72,16 +72,16 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: FadeTransition(
-        opacity: _fadeAnimation,
-        child: Container(
-          width: double.infinity,
-          height: double.infinity,
-          clipBehavior: Clip.antiAlias,
-          decoration: const BoxDecoration(
-            color: Color.fromARGB(255, 245, 243, 242),
-          ),
-          child: Column(
+        body: FadeTransition(
+      opacity: _fadeAnimation,
+      child: Container(
+        width: double.infinity,
+        height: double.infinity,
+        clipBehavior: Clip.antiAlias,
+        decoration: const BoxDecoration(
+          color: Color.fromARGB(255, 245, 243, 242),
+        ),
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Align(
@@ -173,9 +173,9 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ],
           currentIndex: _selectedIndex,
-          selectedItemColor: const Color(0xFFAAC7C0), // Deep purple color
-          unselectedItemColor:
-              const Color.fromARGB(255, 255, 255, 255), // Light teal color
+          selectedItemColor:
+              const Color.fromARGB(255, 255, 255, 255), // Deep purple color
+          unselectedItemColor: const Color(0xFFAAC7C0), // Light teal color
           onTap: _onItemTapped,
         ),
       ),

@@ -65,11 +65,18 @@ async function getMockedBankAccountInfo(userId) {
 // Mock function to retrieve user goals
 async function getMockedGoals(userId) {
   await new Promise((resolve) => setTimeout(resolve, 500));
-  return [
-    { id: "1", title: "Save $10,000 for a vacation", progress: "50%" },
-    { id: "2", title: "Pay off credit card debt", progress: "30%" },
-    { id: "3", title: "Build an emergency fund", progress: "70%" },
-  ];
+  return {
+    shortTerm: [
+      { id: "1", title: "Save $500 for a weekend trip", progress: "70%" },
+      { id: "2", title: "Pay off $200 credit card balance", progress: "50%" },
+      { id: "3", title: "Buy a new pair of running shoes", progress: "30%" },
+    ],
+    longTerm: [
+      { id: "4", title: "Save $10,000 for a vacation", progress: "40%" },
+      { id: "5", title: "Build a $50,000 retirement fund", progress: "20%" },
+      { id: "6", title: "Buy a house", progress: "10%" },
+    ],
+  };
 }
 
 // ==========================

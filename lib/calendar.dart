@@ -60,9 +60,10 @@ class _CalendarState extends State<Calendar> {
     final response = await http.get(uri);
 
     if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body);
+      final Map<String, dynamic> data = json.decode(response.body);
       setState(() {
-        _goals = List<Map<String, dynamic>>.from(data);
+        // Extract only short-term goals
+        _goals = List<Map<String, dynamic>>.from(data["shortTerm"]);
       });
     } else {
       throw Exception('Failed to load goals');

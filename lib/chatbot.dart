@@ -11,6 +11,7 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   TextEditingController _controller = TextEditingController();
   String _response = "";
+  bool _isLoading = false;
 
   final String _cloudflareWorkerUrl =
       "https://rag-ai.moniquesimberg.workers.dev/";
@@ -29,6 +30,10 @@ class _ChatScreenState extends State<ChatScreen> {
     final Uri uri = Uri.parse(
         "$_cloudflareWorkerUrl?userId=$_userId&text=${Uri.encodeComponent(question)}");
 
+    setState(() {
+      _isLoading = true; // Show loading message
+    });
+
     try {
       final response = await http.get(uri);
 
@@ -46,6 +51,10 @@ class _ChatScreenState extends State<ChatScreen> {
     } catch (e) {
       setState(() {
         _response = "Failed to get response: $e";
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
       });
     }
   }
@@ -68,16 +77,16 @@ class _ChatScreenState extends State<ChatScreen> {
           children: <Widget>[
             Container(
               decoration: BoxDecoration(
-                color: Color.fromARGB(255, 55, 121, 140),
+                color: const Color.fromARGB(255, 55, 121, 140),
                 borderRadius: BorderRadius.circular(15.0),
               ),
               child: Padding(
-                padding: EdgeInsets.only(left: 20, bottom: 10, right: 20),
+                padding: const EdgeInsets.only(left: 20, bottom: 10, right: 20),
                 child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      _response,
-                      style: TextStyle(color: Colors.white),
+                      _isLoading ? "\nPenny is Thinking...\n" : _response,    // loading message or response
+                      style: const TextStyle(color: Colors.white),
                     )),
               ),
             ),

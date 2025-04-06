@@ -118,18 +118,6 @@ async function getMockedBankAccountInfo(userId) {
   };
 }
 
-// Mock function to retrieve user goals
-async function getMockedGoals(userId) {
-  // Simulate a delay to mimic an API call
-  await new Promise((resolve) => setTimeout(resolve, 500));
-
-  // Return mocked goals
-  return [
-    { id: "1", title: "Save $10,000 for a vacation", progress: "50%" },
-    { id: "2", title: "Pay off credit card debt", progress: "30%" },
-    { id: "3", title: "Build an emergency fund", progress: "70%" },
-  ];
-}
 
 
 
@@ -347,6 +335,31 @@ app.get('/recent-purchases', async (c) => {
   } catch (error) {
     console.error("Error fetching recent purchases:", error);
     return c.text("Failed to retrieve recent purchases.", 500);
+  }
+});
+
+// Mock function to retrieve user goals
+async function getMockedGoals(userId) {
+  await new Promise((resolve) => setTimeout(resolve, 500));
+  return [
+    { id: "1", title: "Save $10,000 for a vacation", progress: "50%" },
+    { id: "2", title: "Pay off credit card debt", progress: "30%" },
+    { id: "3", title: "Build an emergency fund", progress: "70%" },
+  ];
+}
+
+// Route to fetch user goals
+app.get('/goals', async (c) => {
+  const userId = c.req.query('userId') || 'default';
+
+  try {
+    const goals = await getMockedGoals(userId);
+    const response = c.json(goals);
+    response.headers.set("Access-Control-Allow-Origin", "*");
+    return response;
+  } catch (error) {
+    console.error("Error in /goals:", error);
+    return c.text("Failed to retrieve goals.", 500);
   }
 });
 

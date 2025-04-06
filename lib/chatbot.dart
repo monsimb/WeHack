@@ -16,7 +16,9 @@ class _ChatScreenState extends State<ChatScreen> {
       "https://rag-ai.moniquesimberg.workers.dev/";
 
   Future<void> _sendQuestion(String question) async {
-    final Uri uri = Uri.parse("$_cloudflareWorkerUrl?text=$question");
+    const String userId = "user123"; // Replace with a dynamic user ID if needed
+    final Uri uri =
+        Uri.parse("$_cloudflareWorkerUrl?userId=$userId&text=$question");
 
     try {
       final response = await http.get(uri);
@@ -48,29 +50,29 @@ class _ChatScreenState extends State<ChatScreen> {
         backgroundColor: const Color.fromARGB(255, 55, 121, 140),
       ),
       body: SingleChildScrollView(
-      child: Padding(
+          child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.end,
           children: <Widget>[
             Container(
               decoration: BoxDecoration(
-              color: Color.fromARGB(255, 55, 121, 140),
-              borderRadius: BorderRadius.circular(15.0),
-            ),
-            child: Padding(
-              padding: EdgeInsets.only(left: 20, bottom: 10, right: 20),
-              child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    _response,
-                    style: TextStyle(color: Colors.white),
-                  )),
+                color: Color.fromARGB(255, 55, 121, 140),
+                borderRadius: BorderRadius.circular(15.0),
+              ),
+              child: Padding(
+                padding: EdgeInsets.only(left: 20, bottom: 10, right: 20),
+                child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      _response,
+                      style: TextStyle(color: Colors.white),
+                    )),
               ),
             ),
             SizedBox(height: 16),
             Padding(
-            padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0),
               child: Row(
                 children: [
                   Expanded(

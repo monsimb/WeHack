@@ -1,10 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-<<<<<<< HEAD
-// import 'pages.dart'; // Import the pages file
-import 'chat.dart';
-=======
->>>>>>> 0db4a7ba1b7032415b02276bdf00dc3c446f5ded
 import 'dashboard.dart';
 import 'settings.dart';
 import 'chatbot.dart';

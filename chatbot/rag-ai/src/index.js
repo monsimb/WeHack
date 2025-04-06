@@ -304,7 +304,7 @@ ${bankAccountInfo.transactions
     .filter(Boolean)
     .join("\n\n");
 
-  const systemPrompt = `Your name is Penny. You are a financial advisor. Use the provided context, including the user's financial goals and their progress, to evaluate whether the user is on track to reach their goals. Provide a clear and concise assessment based on the context.`;
+  const systemPrompt = `Your name is Penny. You are a financial advisor. Use the provided context, including the user's financial goals and their progress, to evaluate whether the user is on track to reach their goals. Provide a clear and concise assessment based on the context. Limit your response to 150 words.`;
 
   const { response: answer } = await c.env.AI.run('@cf/meta/llama-3-8b-instruct', {
     messages: [
@@ -314,8 +314,9 @@ ${bankAccountInfo.transactions
       { role: 'user', content: question },
     ],
   });
-
-  const responseText = `${answer}`;
+  
+  // Limit the response to 150 words
+  const responseText = answer.split(' ').slice(0, 150).join(' ');
 
   if (!chatHistory[userId]) chatHistory[userId] = [];
   chatHistory[userId].push({ role: 'user', content: question });

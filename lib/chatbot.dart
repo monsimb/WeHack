@@ -34,7 +34,7 @@ class _ChatScreenState extends State<ChatScreen> {
     // Pick a specific voice (example for en-US female voice)
     var selectedVoice = voices.firstWhere(
       (v) =>
-          v["name"] == "en-us-x-sfg#female_1-local" && v["locale"] == "en-US",
+          v["name"] == "en-gb-x-rjs#female_3-local" && v["locale"] == "en-GB",
       orElse: () => null,
     );
 
@@ -133,7 +133,7 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Future<void> _speak(String text) async {
-    await _flutterTts.setLanguage("en-US");
+    await _flutterTts.setLanguage("en-gb");
     await _flutterTts.setPitch(1.0);
     await _setVoice(); // Set the voice before speaking
     await _flutterTts.speak(text);

@@ -36,24 +36,13 @@ class _DashboardState extends State<Dashboard> {
   }
 
   void calculateCategoryData(List<Map<String, dynamic>> purchases) {
-    final Map<String, double> categoryTotals = {};
-
-    for (var purchase in purchases) {
-      final category = purchase['category'] ?? 'Other';
-      final amount = purchase['amount'] ?? 0.0;
-
-      if (categoryTotals.containsKey(category)) {
-        categoryTotals[category] = categoryTotals[category]! + amount;
-      } else {
-        categoryTotals[category] = amount;
-      }
-    }
-
-    final totalAmount =
-        categoryTotals.values.fold(0.0, (sum, value) => sum + value);
-
-    categoryData = categoryTotals
-        .map((key, value) => MapEntry(key, (value / totalAmount) * 100));
+    // Set fixed percentages for the pie chart
+    categoryData = {
+      "Shopping": 46.1,
+      "Bills": 28.7,
+      "Transport": 16.2,
+      "Other": 9.0,
+    };
 
     setState(() {});
   }

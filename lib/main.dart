@@ -1,6 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'pages.dart'; // Import the pages file
+import 'dashboard.dart';
+import 'settings.dart';
+import 'chatbot.dart';
+import 'calendar.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,8 +17,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        colorScheme:
-            ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 55, 121, 140)),
+        colorScheme: ColorScheme.fromSeed(
+            seedColor: const Color.fromARGB(255, 55, 121, 140)),
         useMaterial3: true,
       ),
       home: const SplashScreen(), // Set the splash screen as the initial page
@@ -36,9 +39,13 @@ class _SplashScreenState extends State<SplashScreen> {
 
     Timer(
         const Duration(seconds: 2),
-        () => Navigator.of(context).pushReplacement(MaterialPageRoute(
-            builder: (BuildContext context) => const MyHomePage(title: 'title')),));
+        () => Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                  builder: (BuildContext context) =>
+                      const MyHomePage(title: 'title')),
+            ));
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,7 +53,8 @@ class _SplashScreenState extends State<SplashScreen> {
         width: double.infinity,
         height: double.infinity,
         clipBehavior: Clip.antiAlias,
-        decoration: const BoxDecoration(color: Color.fromARGB(255, 245, 243, 242)),
+        decoration:
+            const BoxDecoration(color: Color.fromARGB(255, 245, 243, 242)),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -90,9 +98,9 @@ class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
 
   static const List<Widget> _pages = <Widget>[
+    Chatbot(),
     Dashboard(),
-    LookBackward(),
-    LookOnward(),
+    Calendar(),
     SettingsPage(),
   ];
 
@@ -110,7 +118,7 @@ class _MyHomePageState extends State<MyHomePage> {
       bottomNavigationBar: Theme(
         data: Theme.of(context).copyWith(
             // sets the background color of the `BottomNavigationBar`
-            canvasColor: Color.fromARGB(255, 55, 121, 140)),
+            canvasColor: const Color.fromARGB(255, 55, 121, 140)),
         child: BottomNavigationBar(
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(
@@ -139,9 +147,9 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ],
           currentIndex: _selectedIndex,
-          selectedItemColor: Color(0xFFAAC7C0), // Deep purple color
+          selectedItemColor: const Color(0xFFAAC7C0), // Deep purple color
           unselectedItemColor:
-              Color.fromARGB(255, 255, 255, 255), // Light teal color
+              const Color.fromARGB(255, 255, 255, 255), // Light teal color
           onTap: _onItemTapped,
         ),
       ),

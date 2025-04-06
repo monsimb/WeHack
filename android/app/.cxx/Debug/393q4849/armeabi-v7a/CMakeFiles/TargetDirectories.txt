@@ -1,0 +1,2 @@
+C:/Users/mosim/Downloads/wehack/plan_it/android/app/.cxx/Debug/393q4849/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/mosim/Downloads/wehack/plan_it/android/app/.cxx/Debug/393q4849/armeabi-v7a/CMakeFiles/rebuild_cache.dir

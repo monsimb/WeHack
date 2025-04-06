@@ -38,7 +38,7 @@ class Dashboard extends StatelessWidget {
                 ),
                 child: const Center(
                   child: Text(
-                    "Welcome Back, Name!",
+                    "Welcome Back, Khoa!",
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.w600,

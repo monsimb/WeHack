@@ -8,12 +8,15 @@ class SettingsPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'App Settings',
-          style: TextStyle(color: Colors.white), // Set text color to white
+          'Settings',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
-        backgroundColor: const Color.fromARGB(255, 55, 121, 140),
-        iconTheme:
-            const IconThemeData(color: Colors.white), // Set icon color to white
+        backgroundColor: const Color(0xff37798c), // Match the dashboard theme
+        centerTitle: true,
       ),
       body: Container(
         color: const Color(0xFFF5F3F2), // Set background color to #f5f3f2

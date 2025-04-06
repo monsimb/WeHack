@@ -125,7 +125,7 @@ class _MyHomePageState extends State<MyHomePage> {
               icon: ImageIcon(
                 AssetImage('assets/past.png'), // Custom dashboard icon
               ),
-              label: 'ChatBot',
+              label: 'Penny',
             ),
             BottomNavigationBarItem(
               icon: ImageIcon(

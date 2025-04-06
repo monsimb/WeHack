@@ -178,12 +178,16 @@ class _ChatScreenState extends State<ChatScreen> {
                     padding: const EdgeInsets.all(12.0),
                     decoration: BoxDecoration(
                       color: isUser
-                          ? const Color(0xff37798c)
+                          ? const Color(
+                              0xffcb2b49) // Changed to #cb2b49 for user messages
                           : const Color.fromARGB(255, 55, 121, 140),
                       borderRadius: BorderRadius.circular(15.0),
                     ),
                     child: Text(
                       message["content"] ?? "",
+                      textAlign: isUser
+                          ? TextAlign.right
+                          : TextAlign.left, // Alignment for text
                       style: const TextStyle(color: Colors.white),
                     ),
                   ),

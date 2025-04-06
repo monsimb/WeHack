@@ -98,6 +98,38 @@ flutter:
   #       - asset: fonts/TrajanPro.ttf
   #       - asset: fonts/TrajanPro_Bold.ttf
   #         weight: 700
+  fonts:
+    - family: Bai Jamjuree
+      fonts: 
+      - asset: assets/fonts/BaiJamjuree-Bold.ttf
+        weight: 700
+      - asset: assets/fonts/BaiJamjuree-BoldItalic.ttf
+        weight: 700
+        style: italic
+      - asset: assets/fonts/BaiJamjuree-ExtraLight.ttf
+        weight: 200
+      - asset: assets/fonts/BaiJamjuree-ExtraLightItalic.ttf
+        weight: 200
+        style: italic
+      - asset: assets/fonts/BaiJamjuree-Italic.ttf
+        style: italic
+      - asset: assets/fonts/BaiJamjuree-Light.ttf
+        weight: 300
+      - asset: assets/fonts/BaiJamjuree-LightItalic.ttf
+        weight: 300
+        style: italic
+      - asset: assets/fonts/BaiJamjuree-Medium.ttf
+        weight: 500
+      - asset: assets/fonts/BaiJamjuree-MediumItalic.ttf
+        weight: 500
+        style: italic
+      - asset: assets/fonts/BaiJamjuree-Regular.ttf
+        weight: 400
+      - asset: assets/fonts/BaiJamjuree-SemiBold.ttf
+        weight: 600
+      - asset: assets/fonts/BaiJamjuree-SemiBoldItalic.ttf
+        weight: 600
+        style: italic
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages

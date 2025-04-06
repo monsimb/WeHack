@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'pages.dart'; // Import the pages file
+import 'pages.dart';
+import 'settings.dart';
 
 void main() {
   runApp(const MyApp());
@@ -25,6 +26,23 @@ class MyApp extends StatelessWidget {
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
 
+<<<<<<< Updated upstream
+=======
+class _SplashScreenState extends State<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+
+    Timer(
+        const Duration(seconds: 2),
+        () => Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                  builder: (BuildContext context) =>
+                      const MyHomePage(title: 'title')),
+            ));
+  }
+
+>>>>>>> Stashed changes
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,7 +50,12 @@ class SplashScreen extends StatelessWidget {
         width: double.infinity,
         height: double.infinity,
         clipBehavior: Clip.antiAlias,
+<<<<<<< Updated upstream
         decoration: const BoxDecoration(color: Color(0xFFF7E0CA)),
+=======
+        decoration:
+            const BoxDecoration(color: Color.fromARGB(255, 245, 243, 242)),
+>>>>>>> Stashed changes
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -144,9 +167,8 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ],
           currentIndex: _selectedIndex,
-          selectedItemColor: Color(0xFFAAC7C0), // Deep purple color
-          unselectedItemColor:
-              Color.fromARGB(255, 255, 255, 255), // Light teal color
+          selectedItemColor: Color(0xFFAAC7C0),
+          unselectedItemColor: Color.fromARGB(255, 255, 255, 255),
           onTap: _onItemTapped,
         ),
       ),

@@ -29,9 +29,11 @@ class _GoalsPageState extends State<GoalsPage> {
             const IconThemeData(color: Colors.white), // Set icon color to white
       ),
       body: SingleChildScrollView(
+          child: Align(
+        alignment: Alignment.center,
+        // Align the content to the center of the screen
         child: Column(
-          mainAxisAlignment:
-              MainAxisAlignment.center, // Center-align containers
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // Short Term Goals
             Padding(
@@ -268,9 +270,61 @@ class _GoalsPageState extends State<GoalsPage> {
                               color: const Color.fromARGB(255, 245, 243, 242),
                             ),
                             child: Padding(
-                              padding: const EdgeInsets.all(8),
+                              padding: const EdgeInsets.only(
+                                  top: 5, bottom: 5, left: 10, right: 10),
                               child: Column(
                                 children: [
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      const Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: Text(
+                                            "Term Type:",
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 18,
+                                              fontFamily: 'Bai Jamjuree',
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          )),
+                                      SizedBox(width: 25),
+                                      Align(
+                                          alignment: Alignment.centerRight,
+                                          child: ElevatedButton(
+                                              onPressed: () {
+                                                // select type
+                                              },
+                                              child: const Text(
+                                                "Short",
+                                                style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 12,
+                                                  fontFamily: 'Bai Jamjuree',
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ))),
+                                      Align(
+                                          alignment: Alignment.centerRight,
+                                          child: ElevatedButton(
+                                              onPressed: () {
+                                                // select type
+                                              },
+                                              child: const Text(
+                                                "Long",
+                                                style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 12,
+                                                  fontFamily: 'Bai Jamjuree',
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ))),
+                                    ],
+                                  ),
+                                  SizedBox(height: 8),
                                   Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
@@ -369,7 +423,7 @@ class _GoalsPageState extends State<GoalsPage> {
             ),
           ],
         ),
-      ),
+      )),
     );
   }
 }

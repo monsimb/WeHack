@@ -124,80 +124,74 @@ class _DashboardState extends State<Dashboard> {
 
               const SizedBox(height: 30),
 
-              // Pie Chart Section with Tip
+              // Pie Chart Section with Tip Inside
               Container(
                 width: 400,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Tip Label
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 8.0),
-                      child: Text(
-                        generateTip(),
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.black54,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(25),
+                  color: const Color(0xfff5f3f2),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    children: [
+                      // Tip Label Inside the Pie Chart Container
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 16.0),
+                        child: Text(
+                          generateTip(),
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black54,
+                          ),
+                          textAlign: TextAlign.left,
                         ),
                       ),
-                    ),
-                    // Pie Chart Container
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(25),
-                        color: const Color(0xfff5f3f2),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Column(
-                          children: [
-                            SizedBox(
-                              height: 200,
-                              child: categoryData.isEmpty
-                                  ? const Center(
-                                      child: Text(
-                                        "No data available for the pie chart.",
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w500),
+                      // Pie Chart
+                      SizedBox(
+                        height: 200,
+                        child: categoryData.isEmpty
+                            ? const Center(
+                                child: Text(
+                                  "No data available for the pie chart.",
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500),
+                                ),
+                              )
+                            : PieChart(
+                                PieChartData(
+                                  sections: categoryData.entries.map((entry) {
+                                    return PieChartSectionData(
+                                      value: entry.value,
+                                      color: _getCategoryColor(entry.key),
+                                      title:
+                                          '${entry.value.toStringAsFixed(1)}%',
+                                      titleStyle: const TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
                                       ),
-                                    )
-                                  : PieChart(
-                                      PieChartData(
-                                        sections:
-                                            categoryData.entries.map((entry) {
-                                          return PieChartSectionData(
-                                            value: entry.value,
-                                            color: _getCategoryColor(entry.key),
-                                            title:
-                                                '${entry.value.toStringAsFixed(1)}%',
-                                            titleStyle: const TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white,
-                                            ),
-                                          );
-                                        }).toList(),
-                                        sectionsSpace: 2,
-                                        centerSpaceRadius: 40,
-                                      ),
-                                    ),
-                            ),
-                            const SizedBox(height: 16.0),
-                            Column(
-                              children: categoryData.entries.map((entry) {
-                                return LegendItem(
-                                  color: _getCategoryColor(entry.key),
-                                  text: entry.key,
-                                );
-                              }).toList(),
-                            ),
-                          ],
-                        ),
+                                    );
+                                  }).toList(),
+                                  sectionsSpace: 2,
+                                  centerSpaceRadius: 40,
+                                ),
+                              ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 16.0),
+                      // Legend
+                      Column(
+                        children: categoryData.entries.map((entry) {
+                          return LegendItem(
+                            color: _getCategoryColor(entry.key),
+                            text: entry.key,
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ),
                 ),
               ),
 
@@ -328,7 +322,7 @@ class _DashboardState extends State<Dashboard> {
                   width: 400,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(25),
-                    color: const Color(0xfff5f3f2),
+                    color: const Color(0xffaac7c0),
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(20),
@@ -350,7 +344,7 @@ class _DashboardState extends State<Dashboard> {
                             child: Container(
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(15),
-                                color: const Color(0xff37798c),
+                                color: const Color(0xfff5f3f2),
                               ),
                               child: Padding(
                                 padding: const EdgeInsets.all(12.0),
@@ -362,7 +356,7 @@ class _DashboardState extends State<Dashboard> {
                                       style: const TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
-                                        color: Colors.white,
+                                        color: Colors.black,
                                       ),
                                     ),
                                     const SizedBox(height: 8),
@@ -371,7 +365,7 @@ class _DashboardState extends State<Dashboard> {
                                       style: const TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w400,
-                                        color: Colors.white70,
+                                        color: Colors.black,
                                       ),
                                     ),
                                   ],

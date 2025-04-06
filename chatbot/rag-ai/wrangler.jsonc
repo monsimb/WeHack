@@ -33,6 +33,12 @@
 		"class_name": "RAGWorkflow"
 		}
 	],
+	"vars": {
+		"MONGO_APP_ID": "your-app-id",
+		"MONGO_CLUSTER": "Cluster0",
+		"MONGO_DB": "ragdb",
+		"MONGO_COLLECTION": "notes"
+	},
 
 
 	/**

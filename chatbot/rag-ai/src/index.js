@@ -13,6 +13,10 @@ import { Hono } from "hono";
 
 const app = new Hono();
 
+
+
+
+
 async function queryMongoNoteById(env, vecId) {
   const res = await fetch(`https://data.mongodb-api.com/app/${env.MONGO_APP_ID}/endpoint/data/v1/action/findOne`, {
     method: 'POST',
@@ -31,6 +35,7 @@ async function queryMongoNoteById(env, vecId) {
   const json = await res.json();
   return json?.document?.text || null;
 }
+
 
 
 // Existing post route...
@@ -55,9 +60,10 @@ app.get('/', async (c) => {
   const contextMessage = notes.length
     ? `Context:\n${notes.map(note => `- ${note}`).join("\n")}`
     : "";
-  console.log(contextMessage);
+  
+    
 
-  const systemPrompt = `Your name is Penny. When answering the question or responding, use the context provided, if it is provided and relevant.`;
+  const systemPrompt = `Your name is Penny. You are a financial advisor. When answering the question or responding, use the context provided, if it is provided and relevant.`;
 
   const { response: answer } = await c.env.AI.run('@cf/meta/llama-3-8b-instruct', {
     messages: [
@@ -66,8 +72,12 @@ app.get('/', async (c) => {
       { role: 'user', content: question }
     ]
   });
+  const responseText = `
+    ${contextMessage ? contextMessage + "\n\n" : ""}
+    Answer: ${answer}
+  `;
 
-  const response = c.text(answer);
+  const response = c.text(responseText);
   response.headers.set("Access-Control-Allow-Origin", "*");
   response.headers.set("Access-Control-Allow-Methods", "GET, POST");
   response.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");

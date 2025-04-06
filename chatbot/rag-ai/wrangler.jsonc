@@ -34,9 +34,9 @@
 		}
 	],
 	"vars": {
-		"MONGO_APP_ID": "your-app-id",
+		"MONGO_APP_ID": "67f193d692ecf51d5d444537",
 		"MONGO_CLUSTER": "Cluster0",
-		"MONGO_DB": "ragdb",
+		"MONGO_DB": "wehack",
 		"MONGO_COLLECTION": "notes"
 	},
 

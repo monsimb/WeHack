@@ -15,17 +15,28 @@ class _ChatScreenState extends State<ChatScreen> {
   final String _cloudflareWorkerUrl =
       "https://rag-ai.moniquesimberg.workers.dev/";
 
+  // Generate a unique user ID for the session (replace with dynamic logic if needed)
+  final String _userId = DateTime.now().millisecondsSinceEpoch.toString();
+
   Future<void> _sendQuestion(String question) async {
-    const String userId = "user123"; // Replace with a dynamic user ID if needed
-    final Uri uri =
-        Uri.parse("$_cloudflareWorkerUrl?userId=$userId&text=$question");
+    if (question.isEmpty) {
+      setState(() {
+        _response = "Please enter a question.";
+      });
+      return;
+    }
+
+    final Uri uri = Uri.parse(
+        "$_cloudflareWorkerUrl?userId=$_userId&text=${Uri.encodeComponent(question)}");
 
     try {
       final response = await http.get(uri);
 
       if (response.statusCode == 200) {
+        // Parse the response if it's JSON
+        final responseBody = response.body;
         setState(() {
-          _response = response.body;
+          _response = responseBody; // Update with the server's response
         });
       } else {
         setState(() {
@@ -88,6 +99,8 @@ class _ChatScreenState extends State<ChatScreen> {
                   ElevatedButton(
                     onPressed: () {
                       _sendQuestion(_controller.text);
+                      _controller
+                          .clear(); // Clear the input field after sending
                     },
                     child: const Text('Send'),
                   ),
@@ -100,75 +113,3 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 }
-
-// class Chatbot extends StatefulWidget {
-//   const Chatbot({super.key});
-
-//   @override
-//   State<Chatbot> createState() => _ChatbotState();
-// }
-
-// class _ChatbotState extends State<Chatbot> {
-//   final TextEditingController _controller = TextEditingController();
-//   final List<String> _messages = [];
-
-//   void _sendMessage() {
-//     if (_controller.text.isNotEmpty) {
-//       setState(() {
-//         _messages.add(_controller.text);
-//         _controller.clear();
-//       });
-//     }
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: const Text(
-//           'Chatbot',
-//           style: TextStyle(color: Colors.white),
-//         ),
-//         backgroundColor: const Color.fromARGB(255, 55, 121, 140),
-//       ),
-//       body: Column(
-//         children: [
-//           Expanded(
-//             child: ListView.builder(
-//               itemCount: _messages.length,
-//               itemBuilder: (context, index) {
-//                 return ListTile(
-//                   title: Text(_messages[index]),
-//                   leading: const CircleAvatar(
-//                     child: Icon(Icons.person),
-//                   ),
-//                 );
-//               },
-//             ),
-//           ),
-//           Padding(
-//             padding: const EdgeInsets.all(8.0),
-//             child: Row(
-//               children: [
-//                 Expanded(
-//                   child: TextField(
-//                     controller: _controller,
-//                     decoration: const InputDecoration(
-//                       hintText: 'Type your message...',
-//                       border: OutlineInputBorder(),
-//                     ),
-//                   ),
-//                 ),
-//                 const SizedBox(width: 8),
-//                 ElevatedButton(
-//                   onPressed: _sendMessage,
-//                   child: const Text('Send'),
-//                 ),
-//               ],
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }

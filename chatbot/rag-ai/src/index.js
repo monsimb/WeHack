@@ -130,7 +130,7 @@ app.get('/', async (c) => {
 
   // Retrieve the user's chat history
   const userChatHistory = chatHistory[userId] || [];
-
+  console.log(`Retrieved chat history for user ${userId}:`, userChatHistory);
 
   // Fetch mocked calendar events
   let calendarEvents = [];
@@ -139,25 +139,27 @@ app.get('/', async (c) => {
   } catch (error) {
     console.error("Error fetching calendar events:", error);
   }
+
   // Format calendar events as context
   const calendarContext = calendarEvents.length
-  ? `Upcoming Events:\n${calendarEvents
-      .map(
-        (event) =>
-          `- ${event.summary} from ${event.start.dateTime} to ${event.end.dateTime}`
-      )
-      .join("\n")}`
-  : "No upcoming events.";
-  // Fetch mocked bank account information
-let bankAccountInfo = {};
-try {
-  bankAccountInfo = await getMockedBankAccountInfo(userId);
-} catch (error) {
-  console.error("Error fetching bank account information:", error);
-}
+    ? `Upcoming Events:\n${calendarEvents
+        .map(
+          (event) =>
+            `- ${event.summary} from ${event.start.dateTime} to ${event.end.dateTime}`
+        )
+        .join("\n")}`
+    : "No upcoming events.";
 
-// Format bank account information as context
-const bankAccountContext = `
+  // Fetch mocked bank account information
+  let bankAccountInfo = {};
+  try {
+    bankAccountInfo = await getMockedBankAccountInfo(userId);
+  } catch (error) {
+    console.error("Error fetching bank account information:", error);
+  }
+
+  // Format bank account information as context
+  const bankAccountContext = `
 Bank Account Information:
 - Account Holder: ${bankAccountInfo.accountHolder}
 - Account Number: ${bankAccountInfo.accountNumber}
@@ -171,48 +173,46 @@ ${bankAccountInfo.transactions
   .join("\n")}
 `;
 
-
-
-
-
   // Add user-specific information (e.g., state they live in)
   const userState = "California"; // Replace with dynamic retrieval logic if needed
   const userInfo = `User Information:\n- State: ${userState}`;
 
+  // Limit chat history to the last 5 messages
+  const limitedChatHistory = userChatHistory.slice(-5);
+  const formattedChatHistory = limitedChatHistory.length
+    ? limitedChatHistory.map((msg, index) => ({
+        role: msg.role,
+        content: msg.content,
+      }))
+    : [];
 
-  // Combine chat history and calendar events into the context message
+  // Combine context into a single message
   const contextMessage = [
-  userChatHistory.length
-    ? `Chat History:\n${userChatHistory
-        .map((msg, index) => `${index + 1}. ${msg}`)
-        .join("\n")}`
-    : "",
-  calendarContext,
-  userInfo,
-  bankAccountContext,
+    calendarContext,
+    userInfo,
+    bankAccountContext,
   ]
-  .filter(Boolean)
-  .join("\n\n");
+    .filter(Boolean)
+    .join("\n\n");
 
   const systemPrompt = `Your name is Penny. You are a financial advisor. When answering the question or responding, use the context provided, if it is provided and relevant.`;
 
   const { response: answer } = await c.env.AI.run('@cf/meta/llama-3-8b-instruct', {
-  messages: [
-    ...(contextMessage ? [{ role: 'system', content: contextMessage }] : []),
-    { role: 'system', content: systemPrompt },
-    { role: 'user', content: question }
-  ]
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'system', content: contextMessage }, // Static context
+      ...formattedChatHistory, // Dynamic user history
+      { role: 'user', content: question }, // Current user question
+    ],
   });
 
-
-  const responseText = `
-  
-  ${answer}
-  `;
+  const responseText = `${answer}`;
 
   // Update the user's chat history
   if (!chatHistory[userId]) chatHistory[userId] = [];
-  chatHistory[userId].push(question);
+  chatHistory[userId].push({ role: 'user', content: question });
+  chatHistory[userId].push({ role: 'assistant', content: answer });
+  console.log(`Updated chat history for user ${userId}:`, chatHistory[userId]);
 
   const response = c.text(responseText);
   response.headers.set("Access-Control-Allow-Origin", "*");
@@ -220,6 +220,7 @@ ${bankAccountInfo.transactions
   response.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
   return response;
 });
+
 
 app.post('/notes', async (c) => {
 	const { text } = await c.req.json();

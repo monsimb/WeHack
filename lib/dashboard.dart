@@ -12,12 +12,17 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardState extends State<Dashboard> {
   late Future<List<Map<String, dynamic>>> _recentPurchases;
+  Map<String, double> categoryData = {
+    "Shopping": 46.1,
+    "Bills": 28.7,
+    "Transport": 16.2,
+    "Other": 9.0,
+  };
 
   @override
   void initState() {
     super.initState();
-    _recentPurchases = fetchRecentPurchases(
-        "default"); // Replace "default" with dynamic userId if needed
+    _recentPurchases = fetchRecentPurchases("default");
   }
 
   Future<List<Map<String, dynamic>>> fetchRecentPurchases(String userId) async {
@@ -26,10 +31,25 @@ class _DashboardState extends State<Dashboard> {
     final response = await http.get(uri);
 
     if (response.statusCode == 200) {
-      return List<Map<String, dynamic>>.from(json.decode(response.body));
+      final purchases =
+          List<Map<String, dynamic>>.from(json.decode(response.body));
+      calculateCategoryData(purchases);
+      return purchases;
     } else {
       throw Exception('Failed to load recent purchases');
     }
+  }
+
+  void calculateCategoryData(List<Map<String, dynamic>> purchases) {
+    // Set fixed percentages for the pie chart
+    categoryData = {
+      "Shopping": 46.1,
+      "Bills": 28.7,
+      "Transport": 16.2,
+      "Other": 9.0,
+    };
+
+    setState(() {});
   }
 
   @override
@@ -57,8 +77,8 @@ class _DashboardState extends State<Dashboard> {
 
               // Welcome Back Card
               Container(
-                width: 359,
-                height: 100,
+                width: 400,
+                height: 90,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(25),
                   color: const Color(0xffcb2b49),
@@ -77,6 +97,88 @@ class _DashboardState extends State<Dashboard> {
 
               const SizedBox(height: 30), // Existing spacing
 
+              // Pie Chart and Legend Background Overlay
+              Container(
+                width: 400, // Match the width of Recent Purchases
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(25),
+                  color: const Color(0xfff5f3f2), // Solid #f5f3f2 background
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    children: [
+                      // Pie Chart
+                      SizedBox(
+                        height: 200,
+                        child: categoryData.values.every((value) => value == 0)
+                            ? const Center(
+                                child: Text(
+                                  "No data available for the pie chart.",
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500),
+                                ),
+                              )
+                            : PieChart(
+                                PieChartData(
+                                  sections: categoryData.entries.map((entry) {
+                                    final total = categoryData.values
+                                        .reduce((a, b) => a + b);
+                                    final percentage =
+                                        (entry.value / total) * 100;
+                                    return PieChartSectionData(
+                                      value: entry.value,
+                                      color: _getCategoryColor(entry.key),
+                                      title:
+                                          '${percentage.toStringAsFixed(1)}%', // Display percentage
+                                      titleStyle: const TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    );
+                                  }).toList(),
+                                  sectionsSpace: 2,
+                                  centerSpaceRadius: 40,
+                                ),
+                              ),
+                      ),
+
+                      const SizedBox(height: 16.0),
+
+                      // Legend (Two Lines)
+                      Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: const [
+                              LegendItem(
+                                  color: Color(0xffcb2b49),
+                                  text: 'Shopping'), // Changed from Food
+                              LegendItem(
+                                  color: Color(0xffaac7c0), text: 'Transport'),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: const [
+                              LegendItem(
+                                  color: Color(0xff37798c),
+                                  text: 'Bills'), // Changed from Shopping
+                              LegendItem(color: Colors.grey, text: 'Other'),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 30),
+
               // Recent Purchases Card
               Padding(
                 padding: const EdgeInsets.all(10),
@@ -84,13 +186,14 @@ class _DashboardState extends State<Dashboard> {
                   width: 400,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(25),
-                    color: const Color(0xff37798c),
+                    color: const Color(0xff37798c), // Dark blue overlay
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(20),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        // Recent Purchases Title
                         Container(
                           width: 400,
                           decoration: BoxDecoration(
@@ -113,7 +216,8 @@ class _DashboardState extends State<Dashboard> {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 20),
+
+                        const SizedBox(height: 16.0),
 
                         // Display Recent Purchases
                         FutureBuilder<List<Map<String, dynamic>>>(
@@ -152,32 +256,36 @@ class _DashboardState extends State<Dashboard> {
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
                                           children: [
-                                            Text(
-                                              purchase['date'],
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
+                                            // Align date and amount on the left
                                             Row(
                                               children: [
                                                 Text(
-                                                  '\$${purchase['amount'].toStringAsFixed(2)}',
-                                                  style: const TextStyle(
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.w600,
-                                                  ),
-                                                ),
-                                                const SizedBox(width: 10),
-                                                Text(
-                                                  purchase['description'],
+                                                  purchase['date'],
                                                   style: const TextStyle(
                                                     fontSize: 14,
                                                     fontWeight: FontWeight.w400,
                                                     color: Colors.grey,
                                                   ),
                                                 ),
+                                                const SizedBox(width: 10),
+                                                Text(
+                                                  '\$${purchase['amount'].toStringAsFixed(2)}',
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w600,
+                                                    color: Colors.black,
+                                                  ),
+                                                ),
                                               ],
+                                            ),
+                                            // Merchant name on the right
+                                            Text(
+                                              purchase['description'],
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w600,
+                                                color: Colors.black,
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -279,6 +387,19 @@ class _DashboardState extends State<Dashboard> {
         ),
       ),
     );
+  }
+
+  Color _getCategoryColor(String category) {
+    switch (category) {
+      case "Shopping":
+        return const Color(0xffcb2b49);
+      case "Bills":
+        return const Color(0xffaac7c0);
+      case "Transport":
+        return const Color(0xff37798c);
+      default:
+        return Colors.grey; // "Other"
+    }
   }
 }
 

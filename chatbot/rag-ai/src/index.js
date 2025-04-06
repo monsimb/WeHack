@@ -87,6 +87,38 @@ async function getMockedGoals(userId) {
   };
 }
 
+// Mock function to retrieve bank account information
+async function getMockedBankAccountInfo(userId) {
+  await new Promise((resolve) => setTimeout(resolve, 500));
+  return {
+    checking: {
+      accountNumber: "987654321",
+      accountHolder: userId || "Default User",
+      balance: 1523.75,
+      transactions: [
+        { date: "2025-04-01", description: "Grocery Store", amount: -45.67 },
+        { date: "2025-04-03", description: "Salary Deposit", amount: 3000.00 },
+        { date: "2025-04-05", description: "Electricity Bill", amount: -120.50 },
+        { date: "2025-04-10", description: "Coffee Shop", amount: -8.75 },
+        { date: "2025-04-15", description: "Gym Membership", amount: -50.00 },
+        { date: "2025-04-20", description: "Online Shopping", amount: -200.00 },
+        { date: "2025-04-25", description: "Restaurant", amount: -75.25 },
+        { date: "2025-04-28", description: "Car Payment", amount: -300.00 },
+      ],
+    },
+    savings: {
+      accountNumber: "123456789",
+      accountHolder: userId || "Default User",
+      balance: 5000.00,
+      transactions: [
+        { date: "2025-04-01", description: "Interest Credit", amount: 10.50 },
+        { date: "2025-04-15", description: "Transfer to Checking", amount: -500.00 },
+        { date: "2025-04-20", description: "Interest Credit", amount: 10.75 },
+      ],
+    },
+  };
+}
+
 // Mock function to retrieve user information
 
 // Future integrations such as skyscanner API to compare the price you've paid for ticket to prices you could get if you trade/exchange them
@@ -108,6 +140,30 @@ app.get('/calendar-events', async (c) => {
   } catch (error) {
     console.error("Error in /calendar-events:", error);
     return c.text("Failed to retrieve calendar events.", 500);
+  }
+});
+
+// Route: Fetch bank account transactions (negative amounts only)
+app.get('/recent-purchases', async (c) => {
+  const userId = c.req.query('userId') || 'default';
+  try {
+    const bankAccountInfo = await getMockedBankAccountInfo(userId);
+
+    // Combine transactions from both accounts
+    const allTransactions = [
+      ...bankAccountInfo.checking.transactions,
+      ...bankAccountInfo.savings.transactions,
+    ];
+
+    // Filter only negative transactions (expenses)
+    const filteredTransactions = allTransactions.filter(txn => txn.amount < 0);
+
+    const response = c.json(filteredTransactions);
+    response.headers.set("Access-Control-Allow-Origin", "*");
+    return response;
+  } catch (error) {
+    console.error("Error in /recent-purchases:", error);
+    return c.text("Failed to retrieve recent purchases.", 500);
   }
 });
 
@@ -153,7 +209,7 @@ app.post('/transcribe', async (c) => {
   const response = await fetch('https://api.deepgram.com/v1/listen', {
     method: 'POST',
     headers: {
-      'Authorization': `Token 805f8b17fcc95912f9bf050785c6972b95b7fe8a`,
+      'Authorization': `Token ${apiKey}`,
       'Content-Type': contentType,
     },
     body: audioBuffer,

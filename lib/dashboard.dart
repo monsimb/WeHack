@@ -47,10 +47,22 @@ class _DashboardState extends State<Dashboard> {
     setState(() {});
   }
 
+  String generateTip() {
+    if (categoryData.isEmpty) {
+      return "Track your spending to see insights here!";
+    }
+
+    // Find the category with the highest percentage
+    final highestCategory =
+        categoryData.entries.reduce((a, b) => a.value > b.value ? a : b);
+
+    return "Tip: Consider reducing your spending on ${highestCategory.key} (${highestCategory.value.toStringAsFixed(1)}%).";
+  }
+
   List<Map<String, String>> generateQuests() {
     return [
       {
-        "title": "Spend < max \$15 for the next 3 days",
+        "title": "Spend max \$15 for the next 3 days",
         "description":
             "Track your daily expenses and ensure you spend less than \$15 for the next 3 days."
       },
@@ -112,59 +124,80 @@ class _DashboardState extends State<Dashboard> {
 
               const SizedBox(height: 30),
 
-              // Pie Chart Section
+              // Pie Chart Section with Tip
               Container(
                 width: 400,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(25),
-                  color: const Color(0xfff5f3f2),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: 200,
-                        child: categoryData.isEmpty
-                            ? const Center(
-                                child: Text(
-                                  "No data available for the pie chart.",
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500),
-                                ),
-                              )
-                            : PieChart(
-                                PieChartData(
-                                  sections: categoryData.entries.map((entry) {
-                                    return PieChartSectionData(
-                                      value: entry.value,
-                                      color: _getCategoryColor(entry.key),
-                                      title:
-                                          '${entry.value.toStringAsFixed(1)}%',
-                                      titleStyle: const TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Tip Label
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: Text(
+                        generateTip(),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black54,
+                        ),
+                      ),
+                    ),
+                    // Pie Chart Container
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(25),
+                        color: const Color(0xfff5f3f2),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          children: [
+                            SizedBox(
+                              height: 200,
+                              child: categoryData.isEmpty
+                                  ? const Center(
+                                      child: Text(
+                                        "No data available for the pie chart.",
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w500),
                                       ),
-                                    );
-                                  }).toList(),
-                                  sectionsSpace: 2,
-                                  centerSpaceRadius: 40,
-                                ),
-                              ),
+                                    )
+                                  : PieChart(
+                                      PieChartData(
+                                        sections:
+                                            categoryData.entries.map((entry) {
+                                          return PieChartSectionData(
+                                            value: entry.value,
+                                            color: _getCategoryColor(entry.key),
+                                            title:
+                                                '${entry.value.toStringAsFixed(1)}%',
+                                            titleStyle: const TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                            ),
+                                          );
+                                        }).toList(),
+                                        sectionsSpace: 2,
+                                        centerSpaceRadius: 40,
+                                      ),
+                                    ),
+                            ),
+                            const SizedBox(height: 16.0),
+                            Column(
+                              children: categoryData.entries.map((entry) {
+                                return LegendItem(
+                                  color: _getCategoryColor(entry.key),
+                                  text: entry.key,
+                                );
+                              }).toList(),
+                            ),
+                          ],
+                        ),
                       ),
-                      const SizedBox(height: 16.0),
-                      Column(
-                        children: categoryData.entries.map((entry) {
-                          return LegendItem(
-                            color: _getCategoryColor(entry.key),
-                            text: entry.key,
-                          );
-                        }).toList(),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
 

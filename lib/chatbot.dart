@@ -85,7 +85,9 @@ class _ChatScreenState extends State<ChatScreen> {
                 child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      _isLoading ? "\nPenny is Thinking...\n" : _response,    // loading message or response
+                      _isLoading
+                          ? "\nPenny is Thinking...\n"
+                          : _response, // loading message or response
                       style: const TextStyle(color: Colors.white),
                     )),
               ),

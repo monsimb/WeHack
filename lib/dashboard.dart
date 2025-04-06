@@ -1,16 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart'; // Add this package for the pie chart
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
-class Dashboard extends StatelessWidget {
+class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
+
+  @override
+  _DashboardState createState() => _DashboardState();
+}
+
+class _DashboardState extends State<Dashboard> {
+  late Future<List<Map<String, dynamic>>> _recentPurchases;
+
+  @override
+  void initState() {
+    super.initState();
+    _recentPurchases = fetchRecentPurchases(
+        "default"); // Replace "default" with dynamic userId if needed
+  }
+
+  Future<List<Map<String, dynamic>>> fetchRecentPurchases(String userId) async {
+    final Uri uri = Uri.parse(
+        'https://rag-ai.moniquesimberg.workers.dev/recent-purchases?userId=$userId');
+    final response = await http.get(uri);
+
+    if (response.statusCode == 200) {
+      return List<Map<String, dynamic>>.from(json.decode(response.body));
+    } else {
+      throw Exception('Failed to load recent purchases');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.symmetric(
-              horizontal: 20.0), // Shift containers to the right
+          padding: const EdgeInsets.symmetric(horizontal: 20.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -48,154 +75,111 @@ class Dashboard extends StatelessWidget {
                     color: const Color(0xff37798c),
                   ),
                   child: Padding(
-                      padding: EdgeInsets.all(20),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                              width: 400,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(25),
-                                color: const Color(0xfff5f3f2),
-                              ),
-                              child: const Padding(
-                                  padding: EdgeInsets.all(10),
-                                  child: Align(
-                                      alignment: Alignment.center,
-                                      child: Text(
-                                        "Recent Purchases",
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 24,
-                                          fontFamily: 'Bai Jamjuree',
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      )))),
-                          const SizedBox(height: 20),
-
-                          // Combined Pie Chart and Legend Overlay
-                          Container(
-                            width: 400,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(25),
-                              color: const Color(0xfff5f3f2),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: SingleChildScrollView(
-                                scrollDirection: Axis
-                                    .horizontal, // Enable horizontal scrolling
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment
-                                      .start, // Align content to the start
-                                  children: [
-                                    const SizedBox(
-                                        width:
-                                            35), // Add spacing to shift content to the right
-
-                                    // Pie Chart
-                                    Container(
-                                      width: 70,
-                                      height: 200,
-                                      child: PieChart(
-                                        PieChartData(
-                                          sections: [
-                                            PieChartSectionData(
-                                              value: 35,
-                                              color: Colors.blue,
-                                              title: '35%',
-                                              titleStyle: const TextStyle(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                            PieChartSectionData(
-                                              value: 25,
-                                              color: Colors.green,
-                                              title: '25%',
-                                              titleStyle: const TextStyle(
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                            PieChartSectionData(
-                                              value: 20,
-                                              color: Colors.orange,
-                                              title: '20%',
-                                              titleStyle: const TextStyle(
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                            PieChartSectionData(
-                                              value: 10,
-                                              color: Colors.red,
-                                              title: '10%',
-                                              titleStyle: const TextStyle(
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                            PieChartSectionData(
-                                              value: 10,
-                                              color: Colors.purple,
-                                              title: '10%',
-                                              titleStyle: const TextStyle(
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                          ],
-                                          sectionsSpace: 2,
-                                          centerSpaceRadius: 40,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 15),
-
-                                    // Legend
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          left:
-                                              48.0), // Shift legend 3 units to the right
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: const [
-                                          LegendItem(
-                                              color: Colors.blue,
-                                              text: 'Groceries'),
-                                          SizedBox(height: 6),
-                                          LegendItem(
-                                              color: Colors.green,
-                                              text: 'Bills'),
-                                          SizedBox(height: 6),
-                                          LegendItem(
-                                              color: Colors.orange,
-                                              text: 'Hobbies'),
-                                          SizedBox(height: 6),
-                                          LegendItem(
-                                              color: Colors.red,
-                                              text: 'Savings'),
-                                          SizedBox(height: 6),
-                                          LegendItem(
-                                              color: Colors.purple,
-                                              text: 'Misc.'),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 400,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(25),
+                            color: const Color(0xfff5f3f2),
+                          ),
+                          child: const Padding(
+                            padding: EdgeInsets.all(10),
+                            child: Align(
+                              alignment: Alignment.center,
+                              child: Text(
+                                "Recent Purchases",
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 24,
+                                  fontFamily: 'Bai Jamjuree',
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
                             ),
                           ),
-                        ],
-                      )),
+                        ),
+                        const SizedBox(height: 20),
+
+                        // Display Recent Purchases
+                        FutureBuilder<List<Map<String, dynamic>>>(
+                          future: _recentPurchases,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const CircularProgressIndicator();
+                            } else if (snapshot.hasError) {
+                              return Text('Error: ${snapshot.error}');
+                            } else if (!snapshot.hasData ||
+                                snapshot.data!.isEmpty) {
+                              return const Text('No recent purchases found.');
+                            } else {
+                              final purchases = snapshot.data!;
+                              return ListView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: purchases.length,
+                                itemBuilder: (context, index) {
+                                  final purchase = purchases[index];
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 5.0),
+                                    child: Container(
+                                      width: 330,
+                                      height: 35,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(25),
+                                        color: const Color(0xfff5f3f2),
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 15.0),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              purchase['date'],
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                            Row(
+                                              children: [
+                                                Text(
+                                                  '\$${purchase['amount'].toStringAsFixed(2)}',
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 10),
+                                                Text(
+                                                  purchase['description'],
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w400,
+                                                    color: Colors.grey,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(height: 25),

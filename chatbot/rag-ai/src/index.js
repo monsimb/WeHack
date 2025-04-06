@@ -118,20 +118,23 @@ async function getMockedBankAccountInfo(userId) {
   };
 }
 
+// Mock function to retrieve user goals
+async function getMockedGoals(userId) {
+  // Simulate a delay to mimic an API call
+  await new Promise((resolve) => setTimeout(resolve, 500));
+
+  // Return mocked goals
+  return [
+    { id: "1", title: "Save $10,000 for a vacation", progress: "50%" },
+    { id: "2", title: "Pay off credit card debt", progress: "30%" },
+    { id: "3", title: "Build an emergency fund", progress: "70%" },
+  ];
+}
 
 
-const chatHistory = {};
 
-// Main route for the chatbot
-// This route handles incoming requests to the chatbot and returns a response based on the user's input
-app.get('/', async (c) => {
-  const userId = c.req.query('userId') || 'default'; // Use a userId to track individual chat histories
-  const question = c.req.query('text') || "what can you do?";
 
-  // Retrieve the user's chat history
-  const userChatHistory = chatHistory[userId] || [];
-  console.log(`Retrieved chat history for user ${userId}:`, userChatHistory);
-
+async function generateContext(userId) {
   // Fetch mocked calendar events
   let calendarEvents = [];
   try {
@@ -140,13 +143,9 @@ app.get('/', async (c) => {
     console.error("Error fetching calendar events:", error);
   }
 
-  // Format calendar events as context
   const calendarContext = calendarEvents.length
     ? `Upcoming Events:\n${calendarEvents
-        .map(
-          (event) =>
-            `- ${event.summary} from ${event.start.dateTime} to ${event.end.dateTime}`
-        )
+        .map((event) => `- ${event.summary} from ${event.start.dateTime} to ${event.end.dateTime}`)
         .join("\n")}`
     : "No upcoming events.";
 
@@ -158,7 +157,6 @@ app.get('/', async (c) => {
     console.error("Error fetching bank account information:", error);
   }
 
-  // Format bank account information as context
   const bankAccountContext = `
 Bank Account Information:
 - Account Holder: ${bankAccountInfo.accountHolder}
@@ -166,43 +164,58 @@ Bank Account Information:
 - Balance: $${bankAccountInfo.balance.toFixed(2)}
 Transactions:
 ${bankAccountInfo.transactions
-  .map(
-    (txn) =>
-      `  - ${txn.date}: ${txn.description} (${txn.amount < 0 ? "-" : "+"}$${Math.abs(txn.amount).toFixed(2)})`
-  )
-  .join("\n")}
-`;
+  .map((txn) => `  - ${txn.date}: ${txn.description} (${txn.amount < 0 ? "-" : "+"}$${Math.abs(txn.amount).toFixed(2)})`)
+  .join("\n")}`;
+
+  // Fetch mocked goals
+  let userGoals = [];
+  try {
+    userGoals = await getMockedGoals(userId);
+  } catch (error) {
+    console.error("Error fetching user goals:", error);
+  }
+
+  const goalsContext = userGoals.length
+    ? `User Goals:\n${userGoals
+        .map((goal) => `- Goal: ${goal.title}, Progress: ${goal.progress}`)
+        .join("\n")}`
+    : "No goals set.";
 
   // Add user-specific information (e.g., state they live in)
-  const userState = "California"; // Replace with dynamic retrieval logic if needed
+  const userState = "California";
   const userInfo = `User Information:\n- State: ${userState}`;
 
-  // Limit chat history to the last 5 messages
+  return [calendarContext, userInfo, bankAccountContext, goalsContext]
+    .filter(Boolean)
+    .join("\n\n");
+}
+
+app.get('/', async (c) => {
+  const userId = c.req.query('userId') || 'default';
+  const question = c.req.query('text') || "What can you do?";
+
+  // Retrieve the user's chat history
+  const userChatHistory = chatHistory[userId] || [];
   const limitedChatHistory = userChatHistory.slice(-5);
   const formattedChatHistory = limitedChatHistory.length
-    ? limitedChatHistory.map((msg, index) => ({
+    ? limitedChatHistory.map((msg) => ({
         role: msg.role,
         content: msg.content,
       }))
     : [];
 
-  // Combine context into a single message
-  const contextMessage = [
-    calendarContext,
-    userInfo,
-    bankAccountContext,
-  ]
-    .filter(Boolean)
-    .join("\n\n");
+  // Generate context
+  const contextMessage = await generateContext(userId);
 
-  const systemPrompt = `Your name is Penny. You are a financial advisor. When answering the question or responding, use the context provided, if it is provided and relevant.`;
+  // Flexible system prompt
+  const systemPrompt = `Your name is Penny. You are a helpful assistant. Use the provided context to answer the user's question as accurately as possible.`;
 
   const { response: answer } = await c.env.AI.run('@cf/meta/llama-3-8b-instruct', {
     messages: [
       { role: 'system', content: systemPrompt },
-      { role: 'system', content: contextMessage }, // Static context
-      ...formattedChatHistory, // Dynamic user history
-      { role: 'user', content: question }, // Current user question
+      { role: 'system', content: contextMessage },
+      ...formattedChatHistory,
+      { role: 'user', content: question },
     ],
   });
 
@@ -212,7 +225,6 @@ ${bankAccountInfo.transactions
   if (!chatHistory[userId]) chatHistory[userId] = [];
   chatHistory[userId].push({ role: 'user', content: question });
   chatHistory[userId].push({ role: 'assistant', content: answer });
-  console.log(`Updated chat history for user ${userId}:`, chatHistory[userId]);
 
   const response = c.text(responseText);
   response.headers.set("Access-Control-Allow-Origin", "*");
@@ -221,6 +233,122 @@ ${bankAccountInfo.transactions
   return response;
 });
 
+
+
+const chatHistory = {};
+
+// Main route for the chatbot
+// This route handles incoming requests to the chatbot and returns a response based on the user's input
+app.get('/', async (c) => {
+  const userId = c.req.query('userId') || 'default';
+  const question = c.req.query('text') || "Am I on track to reach my financial goals based on the provided goals and progress?";
+
+  const userChatHistory = chatHistory[userId] || [];
+
+  let calendarEvents = [];
+  try {
+    calendarEvents = await getGoogleCalendarEvents();
+  } catch (error) {
+    console.error("Error fetching calendar events:", error);
+  }
+
+  const calendarContext = calendarEvents.length
+    ? `Upcoming Events:\n${calendarEvents
+        .map((event) => `- ${event.summary} from ${event.start.dateTime} to ${event.end.dateTime}`)
+        .join("\n")}`
+    : "No upcoming events.";
+
+  let bankAccountInfo = {};
+  try {
+    bankAccountInfo = await getMockedBankAccountInfo(userId);
+  } catch (error) {
+    console.error("Error fetching bank account information:", error);
+  }
+
+  const bankAccountContext = `
+Bank Account Information:
+- Account Holder: ${bankAccountInfo.accountHolder}
+- Account Number: ${bankAccountInfo.accountNumber}
+- Balance: $${bankAccountInfo.balance.toFixed(2)}
+Transactions:
+${bankAccountInfo.transactions
+  .map((txn) => `  - ${txn.date}: ${txn.description} (${txn.amount < 0 ? "-" : "+"}$${Math.abs(txn.amount).toFixed(2)})`)
+  .join("\n")}`;
+
+  const userState = "California";
+  const userInfo = `User Information:\n- State: ${userState}`;
+
+  let userGoals = [];
+  try {
+    userGoals = await getMockedGoals(userId);
+  } catch (error) {
+    console.error("Error fetching user goals:", error);
+  }
+
+  const goalsContext = userGoals.length
+    ? `User Goals:\n${userGoals
+        .map((goal) => `- Goal: ${goal.title}, Progress: ${goal.progress}`)
+        .join("\n")}`
+    : "No goals set.";
+
+  const limitedChatHistory = userChatHistory.slice(-5);
+  const formattedChatHistory = limitedChatHistory.length
+    ? limitedChatHistory.map((msg) => ({
+        role: msg.role,
+        content: msg.content,
+      }))
+    : [];
+
+  const contextMessage = [
+    calendarContext,
+    userInfo,
+    bankAccountContext,
+    goalsContext,
+  ]
+    .filter(Boolean)
+    .join("\n\n");
+
+  const systemPrompt = `Your name is Penny. You are a financial advisor. Use the provided context, including the user's financial goals and their progress, to evaluate whether the user is on track to reach their goals. Provide a clear and concise assessment based on the context.`;
+
+  const { response: answer } = await c.env.AI.run('@cf/meta/llama-3-8b-instruct', {
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'system', content: contextMessage },
+      ...formattedChatHistory,
+      { role: 'user', content: question },
+    ],
+  });
+
+  const responseText = `${answer}`;
+
+  if (!chatHistory[userId]) chatHistory[userId] = [];
+  chatHistory[userId].push({ role: 'user', content: question });
+  chatHistory[userId].push({ role: 'assistant', content: answer });
+
+  const response = c.text(responseText);
+  response.headers.set("Access-Control-Allow-Origin", "*");
+  response.headers.set("Access-Control-Allow-Methods", "GET, POST");
+  response.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  return response;
+});
+
+app.get('/recent-purchases', async (c) => {
+  const userId = c.req.query('userId') || 'default';
+
+  try {
+    const bankAccountInfo = await getMockedBankAccountInfo(userId);
+
+    // Filter transactions to include only those with negative amounts
+    const filteredTransactions = bankAccountInfo.transactions.filter(txn => txn.amount < 0);
+
+    const response = c.json(filteredTransactions);
+    response.headers.set("Access-Control-Allow-Origin", "*");
+    return response;
+  } catch (error) {
+    console.error("Error fetching recent purchases:", error);
+    return c.text("Failed to retrieve recent purchases.", 500);
+  }
+});
 
 app.post('/notes', async (c) => {
 	const { text } = await c.req.json();

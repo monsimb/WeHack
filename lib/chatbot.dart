@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
@@ -10,8 +11,10 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   TextEditingController _controller = TextEditingController();
-  String _response = "";
+  List<Map<String, String>> _messages = []; // List to store messages
   bool _isLoading = false;
+  Timer? _thinkingTimer;
+  String _thinkingMessage = "Penny is Thinking";
 
   final String _cloudflareWorkerUrl =
       "https://rag-ai.moniquesimberg.workers.dev/";
@@ -20,18 +23,23 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Future<void> _sendQuestion(String question) async {
     if (question.isEmpty) {
-      setState(() {
-        _response = "Please enter a question.";
-      });
       return;
     }
 
+    // Add the user's question to the messages list
+    setState(() {
+      _messages.add({"role": "user", "content": question});
+      _isLoading = true;
+
+      // Add a temporary "Penny is Thinking..." message
+      _messages.add({"role": "assistant", "content": _thinkingMessage});
+    });
+
+    // Start the animation for "Penny is Thinking..."
+    _startThinkingAnimation();
+
     final Uri uri = Uri.parse(
         "$_cloudflareWorkerUrl?userId=$_userId&text=${Uri.encodeComponent(question)}");
-
-    setState(() {
-      _isLoading = true;
-    });
 
     try {
       final response = await http.get(uri);
@@ -39,22 +47,68 @@ class _ChatScreenState extends State<ChatScreen> {
       if (response.statusCode == 200) {
         final responseBody = response.body;
         setState(() {
-          _response = responseBody;
+          // Replace the "Penny is Thinking..." message with the actual response
+          _messages.removeLast();
+          _messages.add({"role": "assistant", "content": responseBody});
         });
       } else {
         setState(() {
-          _response = "Error: ${response.statusCode}";
+          // Replace the "Penny is Thinking..." message with an error message
+          _messages.removeLast();
+          _messages.add({
+            "role": "assistant",
+            "content": "Error: ${response.statusCode}"
+          });
         });
       }
     } catch (e) {
       setState(() {
-        _response = "Failed to get response: $e";
+        // Replace the "Penny is Thinking..." message with a failure message
+        _messages.removeLast();
+        _messages.add(
+            {"role": "assistant", "content": "Failed to get response: $e"});
       });
     } finally {
       setState(() {
         _isLoading = false;
       });
+      _stopThinkingAnimation();
     }
+  }
+
+  void _startThinkingAnimation() {
+    _thinkingTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
+      setState(() {
+        if (_thinkingMessage.endsWith("...")) {
+          _thinkingMessage = "Penny is Thinking";
+        } else if (_thinkingMessage.endsWith("..")) {
+          _thinkingMessage = "Penny is Thinking...";
+        } else if (_thinkingMessage.endsWith(".")) {
+          _thinkingMessage = "Penny is Thinking..";
+        } else {
+          _thinkingMessage = "Penny is Thinking.";
+        }
+
+        // Update the last message in the list
+        if (_messages.isNotEmpty &&
+            _messages.last["content"]?.startsWith("Penny is Thinking") ==
+                true) {
+          _messages[_messages.length - 1]["content"] = _thinkingMessage;
+        }
+      });
+    });
+  }
+
+  void _stopThinkingAnimation() {
+    _thinkingTimer?.cancel();
+    _thinkingTimer = null;
+    _thinkingMessage = "Penny is Thinking";
+  }
+
+  @override
+  void dispose() {
+    _thinkingTimer?.cancel();
+    super.dispose();
   }
 
   @override
@@ -73,32 +127,33 @@ class _ChatScreenState extends State<ChatScreen> {
         centerTitle: true,
       ),
       body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Expanded(
-            child: SingleChildScrollView(
+            child: ListView.builder(
               padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
+              itemCount: _messages.length,
+              itemBuilder: (context, index) {
+                final message = _messages[index];
+                final isUser = message["role"] == "user";
+                return Align(
+                  alignment:
+                      isUser ? Alignment.centerRight : Alignment.centerLeft,
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(vertical: 5.0),
+                    padding: const EdgeInsets.all(12.0),
                     decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 55, 121, 140),
+                      color: isUser
+                          ? const Color(0xff37798c)
+                          : const Color.fromARGB(255, 55, 121, 140),
                       borderRadius: BorderRadius.circular(15.0),
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          _isLoading ? "\nPenny is Thinking...\n" : _response,
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                      ),
+                    child: Text(
+                      message["content"] ?? "",
+                      style: const TextStyle(color: Colors.white),
                     ),
                   ),
-                ],
-              ),
+                );
+              },
             ),
           ),
           Container(

@@ -3,6 +3,7 @@ import 'package:plan_it/goals.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 class Calendar extends StatefulWidget {
   const Calendar({super.key});
@@ -14,6 +15,7 @@ class Calendar extends StatefulWidget {
 class _CalendarState extends State<Calendar> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
+  DateTime? _eventDay;
   Map<DateTime, List<Map<String, dynamic>>> _events = {};
   List<Map<String, dynamic>> _goals = []; // Store fetched goals
 
@@ -34,15 +36,24 @@ class _CalendarState extends State<Calendar> {
       final Map<DateTime, List<Map<String, dynamic>>> events = {};
 
       for (var event in data) {
-        final DateTime eventDate =
-            DateTime.parse(event['start']['dateTime']).toLocal();
+        DateTime eventDate =
+            DateTime.parse(event['start']['dateTime']);
+        eventDate =  DateTime(eventDate.year, eventDate.month, eventDate.day);
+        
+        final DateTime startTime =
+          DateTime.parse(event['start']['dateTime']).toLocal();
+        final DateTime endTime =
+            DateTime.parse(event['end']['dateTime']).toLocal();
+        final String formattedStartTime = DateFormat('hh:mm a').format(startTime);
+        final String formattedEndTime = DateFormat('hh:mm a').format(endTime);
+
         if (!events.containsKey(eventDate)) {
           events[eventDate] = [];
         }
         events[eventDate]!.add({
           'summary': event['summary'],
-          'start': event['start']['dateTime'],
-          'end': event['end']['dateTime'],
+          'start': formattedStartTime, // Use the formatted start time
+          'end': formattedEndTime,     // Use the formatted end time
         });
       }
 
@@ -188,6 +199,7 @@ class _CalendarState extends State<Calendar> {
                 onDaySelected: (selectedDay, focusedDay) {
                   setState(() {
                     _selectedDay = selectedDay;
+                    _eventDay = DateTime(_selectedDay!.year, _selectedDay!.month, _selectedDay!.day);
                     _focusedDay = focusedDay;
                   });
                 },
@@ -207,10 +219,21 @@ class _CalendarState extends State<Calendar> {
                 ),
               ),
               const SizedBox(height: 20),
-              if (_selectedDay != null)
-                Text(
-                  'Selected Day: ${_selectedDay!.toLocal()}',
-                  style: const TextStyle(fontSize: 16),
+              if (_selectedDay != null && _events[_eventDay] != null)
+                Column(
+                  children: _events[_eventDay]!.map((event) {
+                    return ListTile(
+                      title: Text(event['summary']),
+                      subtitle: Text(
+                        'Start: ${event['start']}\nEnd: ${event['end']}',
+                      ),
+                    );
+                  }).toList(),
+                )
+              else
+                const Text(
+                  'No events for this day.',
+                  style: TextStyle(fontSize: 16),
                 ),
             ],
           ),

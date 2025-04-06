@@ -79,6 +79,13 @@ async function getMockedGoals(userId) {
   };
 }
 
+// Mock function to retrieve user information
+
+// Future integrations such as skyscanner API to compare the price you've paid for ticket to prices you could get if you trade/exchange them
+// Integration with Alpha Vantage to help those new to inventing
+
+
+
 // ==========================
 // API Routes
 // ==========================
